@@ -1,8 +1,15 @@
 from fastapi import FastAPI
 from starlette import status
+from functools import lru_cache
 
+from app import config
 
 app = FastAPI()
+
+
+@lru_cache
+def get_settings():
+    return config.Settings()
 
 
 @app.get("/")
