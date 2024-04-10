@@ -14,7 +14,7 @@ pip install -r requirements.txt
 ````
 3. Run the API using uvicorn <i>(please use ````--reload```` option, in that way uvicorn will automatically monitor your project files for changes</i>:
 ````angular2html
-uvicorn app.main:app --reload
+python app/main.py
 ````
 If you want to start tests run pytest command:
 ````pytest````
