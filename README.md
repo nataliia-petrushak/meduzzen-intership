@@ -12,9 +12,11 @@ git clone https://github.com/nataliia-petrushak/meduzzen-intership.git
 ````angular2html
 pip install -r requirements.txt
 ````
-3. Run the API using uvicorn <i>(please use ````--reload```` option, in that way uvicorn will automatically monitor your project files for changes</i>:
+3. In root directory build a Docker image:
 ````angular2html
-python app/main.py
+docker build -t app .  
 ````
-If you want to start tests run pytest command:
-````pytest````
+4. Start your Docker container:
+````angular2html
+docker run -d --name mycontainer -p 8000:8000 app
+````
