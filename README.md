@@ -14,9 +14,9 @@ pip install -r requirements.txt
 ````
 3. In root directory build a Docker image:
 ````angular2html
-docker build -t app .  
+docker-compose build
 ````
 4. Start your Docker container:
 ````angular2html
-docker run -d --name mycontainer -p 8000:8000 app
+docker-compose up
 ````
