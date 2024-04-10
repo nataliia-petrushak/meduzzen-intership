@@ -1,13 +1,7 @@
 from fastapi import FastAPI
-from functools import lru_cache
 
 from app.routers import health
-from app import config
+from app.config import settings
 
 app = FastAPI()
 app.include_router(health.router)
-
-
-@lru_cache
-def get_settings():
-    return config.Settings()
