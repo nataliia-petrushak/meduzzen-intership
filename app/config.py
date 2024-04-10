@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     ]
 
     class Config:
-        env_file = [".env_docker", ".env"]
+        env_file = ".env"
 
 
 settings = Settings()
