@@ -12,11 +12,7 @@ git clone https://github.com/nataliia-petrushak/meduzzen-intership.git
 ````angular2html
 pip install -r requirements.txt
 ````
-3. In root directory build a Docker image:
+3. In root directory build and start a Docker:
 ````angular2html
-docker-compose build
-````
-4. Start your Docker container:
-````angular2html
-docker-compose up
+docker-compose up --build
 ````
