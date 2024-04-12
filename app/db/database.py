@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from config import settings
 
 
-engine = create_async_engine(settings.db_url)
+engine = create_async_engine(settings.postgres_url)
 SessionLocal = sessionmaker(
     bind=engine,
     autocommit=False,
