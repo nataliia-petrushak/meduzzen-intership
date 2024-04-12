@@ -1,4 +1,4 @@
-aioredis==2.0.0
+redis==5.0.3
 asyncpg==0.29.0
 fastapi==0.110.1
 greenlet==3.0.3
