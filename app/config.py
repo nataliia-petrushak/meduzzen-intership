@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     allowed_origins: list[str] = [
         "http://localhost:8080",
         "http://127.0.0.1:8000",
-        "http://0.0.0.0:8000"
+        "http://0.0.0.0:8000",
     ]
 
     class Config:
@@ -23,14 +23,15 @@ class Settings(BaseSettings):
 
     @property
     def postgres_url(self):
-        return (f"postgresql+asyncpg://{self.DATABASE_USER}:"
-                f"{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}"
-                f":{self.DATABASE_PORT}/{self.DATABASE_NAME}")
+        return (
+            f"postgresql+asyncpg://{self.DATABASE_USER}:"
+            f"{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}"
+            f":{self.DATABASE_PORT}/{self.DATABASE_NAME}"
+        )
 
     @property
     def redis_url(self):
-        return (f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
-                f"/{self.REDIS_DB}")
+        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}" f"/{self.REDIS_DB}"
 
 
 settings = Settings()
