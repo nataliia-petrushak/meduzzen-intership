@@ -4,7 +4,7 @@ from db.database import SessionLocal
 
 
 async def get_db() -> AsyncSession:
-    with SessionLocal() as db:
+    async with SessionLocal() as db:
         try:
             yield db
         finally:
