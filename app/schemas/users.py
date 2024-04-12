@@ -7,6 +7,8 @@ class UserBase(BaseModel):
 
 
 class UserSignUp(UserBase):
+    first_name: str
+    last_name: str
     password: str
 
 
@@ -27,4 +29,5 @@ class UserList(UserBase):
 
 
 class UserDetail(UserList):
-    pass
+    first_name: str
+    last_name: str
