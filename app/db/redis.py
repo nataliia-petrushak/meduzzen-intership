@@ -1,13 +1,13 @@
-import redis
+from redis.asyncio import ConnectionPool, Redis
 from config import settings
 
 
 class DBRedisManager:
     def __init__(self):
-        self._pool = redis.ConnectionPool.from_url(
+        self._pool = ConnectionPool.from_url(
             str(settings.REDIS_URL), max_connections=10, decode_responses=True
         )
-        self._redis_client = redis.Redis(connection_pool=self._pool)
+        self._redis_client = Redis(connection_pool=self._pool)
 
     async def read_from_redis(self, key: str) -> dict:
         value = await self._redis_client.get(key)
