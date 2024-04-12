@@ -10,8 +10,7 @@ class DBRedisManager:
         self._redis_client = Redis(connection_pool=self._pool)
 
     async def get_value(self, key: str) -> dict:
-        value = await self._redis_client.get(key)
-        if value is not None:
+        if value := await self._redis_client.get(key):
             return {"key": key, "value": value.decode()}
         return {"message": "Key not found in Redis"}
 
