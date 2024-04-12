@@ -1,5 +1,4 @@
 from pydantic_settings import BaseSettings
-from pydantic import PostgresDsn, validator
 
 
 class Settings(BaseSettings):
@@ -20,7 +19,8 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
-    def get_db_url(self):
+    @property
+    def db_url(self):
         return (f"postgresql+asyncpg://{self.DATABASE_USER}:"
                 f"{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}"
                 f":{self.DATABASE_PORT}/{self.DATABASE_NAME}")
