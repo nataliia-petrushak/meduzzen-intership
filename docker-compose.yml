@@ -4,10 +4,12 @@ services:
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
     env_file:
       - .env
     networks:
-      - test-network
+      - network
 
   web:
     build:
@@ -19,14 +21,14 @@ services:
     depends_on:
       - db
     networks:
-      - test-network
+      - network
 
   redis:
     image: "redis:alpine"
     volumes:
       - redis_data:/data
     networks:
-      - test-network
+      - network
     env_file:
       - .env
 
@@ -35,6 +37,6 @@ volumes:
   redis_data:
 
 networks:
-  test-network:
+  network:
     driver: bridge
 
