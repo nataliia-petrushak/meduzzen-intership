@@ -4,9 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from config import settings
 
 
-SQLALCHEMY_DATABASE_URL = settings.get_db_url()
-
-engine = create_async_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_async_engine(settings.db_url)
 SessionLocal = sessionmaker(
     bind=engine,
     autocommit=False,
