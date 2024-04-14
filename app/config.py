@@ -1,5 +1,3 @@
-import os
-
 from pydantic_settings import BaseSettings
 
 
@@ -21,9 +19,7 @@ class Settings(BaseSettings):
     ]
 
     class Config:
-        env_file = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "..", ".env"
-        )
+        env_file = ".env"
 
     @property
     def postgres_url(self) -> str:
