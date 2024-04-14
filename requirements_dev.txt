@@ -1,5 +1,4 @@
 -r requirements.txt
-psycopg2==2.9.9
 pytest==8.1.1
 black==24.3.0
 loguru=0.7.2
