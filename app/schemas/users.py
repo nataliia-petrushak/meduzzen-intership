@@ -2,18 +2,19 @@ from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
+    id: int
     email: str
     username: str
 
 
-class UserSignUp(UserBase):
+class UserList(UserBase):
+    class Meta:
+        orm_mode = True
+
+
+class UserDetail(UserBase):
     first_name: str
     last_name: str
-    password: str
-
-
-class UserUpdate(UserSignUp):
-    pass
 
 
 class UserSignIn(BaseModel):
@@ -21,13 +22,11 @@ class UserSignIn(BaseModel):
     password: str
 
 
-class UserList(UserBase):
-    id: int
-
-    class Meta:
-        orm_mode = True
-
-
-class UserDetail(UserList):
+class UserSignUp(UserSignIn):
+    username: str
     first_name: str
     last_name: str
+
+
+class UserUpdate(UserSignUp):
+    pass
