@@ -1,14 +1,14 @@
 from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
-from db.database import Base
+from app.db.database import Base
 
 
-class AbstractUser:
+class UserIDBase:
     id: Mapped[int] = mapped_column(Integer(), primary_key=True)
 
 
-class User(Base, AbstractUser):
+class UserBase(Base, UserIDBase):
     __tablename__ = "user"
 
     username: Mapped[str] = mapped_column(String(20), nullable=False)
