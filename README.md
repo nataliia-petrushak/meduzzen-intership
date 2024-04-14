@@ -11,7 +11,7 @@ git clone https://github.com/nataliia-petrushak/meduzzen-intership.git
 2. Make migrations:
 ````angular2html
 cd app/db
-alembic revision --autogenerate
+alembic revision --autogenerate -m "create user table"
 ````
 3. Create a database structure:
 ````angular2html
