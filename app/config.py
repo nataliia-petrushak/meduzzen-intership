@@ -1,3 +1,5 @@
+import os
+
 from pydantic_settings import BaseSettings
 
 
@@ -19,10 +21,12 @@ class Settings(BaseSettings):
     ]
 
     class Config:
-        env_file = ".env"
+        env_file = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "..", ".env"
+        )
 
     @property
-    def postgres_url(self):
+    def postgres_url(self) -> str:
         return (
             f"postgresql+asyncpg://{self.DATABASE_USER}:"
             f"{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}"
@@ -30,7 +34,7 @@ class Settings(BaseSettings):
         )
 
     @property
-    def redis_url(self):
+    def redis_url(self) -> str:
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}" f"/{self.REDIS_DB}"
 
 
