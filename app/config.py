@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     REDIS_HOST: str
     REDIS_PORT: str
     REDIS_DB: str
+    LOG_LEVEL: str
     allowed_origins: list[str] = [
         "http://localhost:8080",
         "http://127.0.0.1:8000",

@@ -2,11 +2,13 @@ import sys
 
 from loguru import logger
 
+from app.config import settings
+
 
 class CustomLogger:
     def __init__(self):
         logger.remove(0)
-        logger.add(sys.stderr)
+        logger.add(sys.stderr, level=settings.LOG_LEVEL)
         self.logger = logger
 
     def info(self, message):
