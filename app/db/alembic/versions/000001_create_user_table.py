@@ -1,14 +1,15 @@
+"""
+create user table
+Revision ID: 000001
+Revises:
+Create Date: 2024-04-12 15:35:11.855991
+"""
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import UUID
 
-"""create user table
-Revision ID: 000001
-Revises: 
-Create Date: 2024-04-12 15:35:11.855991
-"""
 
 revision: str = "000001"
 down_revision: Union[str, None] = None
