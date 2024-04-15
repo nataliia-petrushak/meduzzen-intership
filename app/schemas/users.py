@@ -8,14 +8,11 @@ class UserBase(BaseModel):
     username: str
 
 
-class UserList(UserBase):
+class GetUser(UserBase):
     id: UUID
 
-    class Meta:
-        orm_mode = True
 
-
-class UserDetail(UserList):
+class UserDetail(GetUser):
     pass
 
 
