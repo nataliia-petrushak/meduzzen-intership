@@ -1,32 +1,34 @@
-from pydantic import BaseModel
+from uuid import UUID
+
+from pydantic import BaseModel, EmailStr
 
 
 class UserBase(BaseModel):
-    id: int
-    email: str
+    email: EmailStr
     username: str
 
 
 class UserList(UserBase):
+    id: UUID
+
     class Meta:
         orm_mode = True
 
 
-class UserDetail(UserBase):
-    first_name: str
-    last_name: str
+class UserDetail(UserList):
+    pass
 
 
 class UserSignIn(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
 
-class UserSignUp(UserSignIn):
-    username: str
-    first_name: str
-    last_name: str
+class UserSignUp(UserBase):
+    password: str
 
 
-class UserUpdate(UserSignUp):
-    pass
+class UserUpdate(BaseModel):
+    username: str | None
+    email: EmailStr | None
+    password: str | None
