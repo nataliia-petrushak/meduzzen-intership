@@ -7,9 +7,7 @@ from config import settings
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware, allow_origins=settings.allowed_origins
-)
+app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins)
 
 app.include_router(health.router)
 
