@@ -4,11 +4,11 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     HOST: str
     PORT: int
-    DATABASE_USER: str
-    DATABASE_PASSWORD: str
-    DATABASE_HOST: str
-    DATABASE_PORT: str
-    DATABASE_NAME: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str
+    POSTGRES_PORT: str
+    POSTGRES_NAME: str
     REDIS_HOST: str
     REDIS_PORT: str
     REDIS_DB: str
@@ -25,14 +25,14 @@ class Settings(BaseSettings):
     @property
     def postgres_url(self) -> str:
         return (
-            f"postgresql+asyncpg://{self.DATABASE_USER}:"
-            f"{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}"
-            f":{self.DATABASE_PORT}/{self.DATABASE_NAME}"
+            f"postgresql+asyncpg://{self.POSTGRES_USER}"
+            f":{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}"
+            f":{self.POSTGRES_PORT}/{self.POSTGRES_NAME}"
         )
 
     @property
     def redis_url(self) -> str:
-        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}" f"/{self.REDIS_DB}"
+        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
 
 
 settings = Settings()
