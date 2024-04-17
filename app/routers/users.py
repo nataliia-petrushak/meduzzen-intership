@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from dependencies import get_db
 from schemas.users import GetUser, UserDetail, UserSignUp, UserUpdate
-from crud import users
+from services.users import user_services
 
 router = APIRouter(tags=["users"], prefix="/users")
 
@@ -15,26 +15,26 @@ router = APIRouter(tags=["users"], prefix="/users")
 async def get_user_list(
     offset: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)
 ):
-    return await users.get_user_list(db, offset=offset, limit=limit)
+    return await user_services.get_user_list(db, offset=offset, limit=limit)
 
 
 @router.get("/{user_id}/", response_model=UserDetail)
 async def get_user_by_id(user_id: UUID, db: AsyncSession = Depends(get_db)):
-    return await users.get_user_by_id(db, user_id=user_id)
+    return await user_services.get_user_by_id(db, user_id=user_id)
 
 
 @router.post("/", response_model=UserSignUp)
 async def create_user(user_data: UserSignUp, db: AsyncSession = Depends(get_db)):
-    return await users.create_user(user_data=user_data, db=db)
+    return await user_services.create_user(user_data=user_data, db=db)
 
 
 @router.patch("/{user_id}/", response_model=UserUpdate)
 async def update_user(
     user_id: UUID, user_data: UserUpdate, db: AsyncSession = Depends(get_db)
 ):
-    return await users.update_user(user_data=user_data, db=db, user_id=user_id)
+    return await user_services.update_user(user_data=user_data, db=db, user_id=user_id)
 
 
 @router.delete("/{user_id}/", response_model=dict)
 async def delete_user(user_id: UUID, db: AsyncSession = Depends(get_db)):
-    return await users.delete_user(user_id=user_id, db=db)
+    return await user_services.delete_user(user_id=user_id, db=db)

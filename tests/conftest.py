@@ -6,7 +6,7 @@ from httpx import AsyncClient
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from db.models import Base
+from app.db.models import Base
 
 from app.main import app
 from dependencies import get_db

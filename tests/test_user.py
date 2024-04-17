@@ -5,7 +5,7 @@ from httpx import AsyncClient
 from starlette import status
 
 from schemas.users import UserSignUp, UserUpdate
-from crud import users
+from services.users import user_services
 
 from tests.conftest import AsyncSessionLocal
 
@@ -90,30 +90,30 @@ class TestUserCRUD:
     @pytest.mark.asyncio(scope="function")
     async def test_add_user_func(self, pydentic_create_data):
         async with AsyncSessionLocal() as db:
-            result = await users.create_user(db=db, user_data=pydentic_create_data)
+            result = await user_services.create_user(db=db, user_data=pydentic_create_data)
             assert result["username"] == pydentic_create_data.username
             assert result["email"] == pydentic_create_data.email
 
     @pytest.mark.asyncio(scope="function")
     async def test_get_user_list_func(self):
         async with AsyncSessionLocal() as db:
-            await users.create_user(
+            await user_services.create_user(
                 db=db, user_data=UserSignUp(
                     username="Test", email="user1@user.com", password="123"
                 )
             )
-            await users.create_user(
+            await user_services.create_user(
                 db=db, user_data=UserSignUp(
                     username="Test1", email="user2@user.com", password="123"
                 )
             )
-            await users.create_user(
+            await user_services.create_user(
                 db=db, user_data=UserSignUp(
                     username="Test2", email="user3@user.com", password="123"
                 )
             )
 
-            result = await users.get_user_list(db=db, limit=10, offset=0)
+            result = await user_services.get_user_list(db=db, limit=10, offset=0)
 
             assert len(result) == 4
             assert result[1].username == "Test"
@@ -123,9 +123,9 @@ class TestUserCRUD:
     @pytest.mark.asyncio(scope="function")
     async def test_get_user_by_id_func(self):
         async with AsyncSessionLocal() as db:
-            user = await users.get_user_list(db=db, limit=1, offset=0)
+            user = await user_services.get_user_list(db=db, limit=1, offset=0)
             user_id = user[0].id
-            result = await users.get_user_by_id(db=db, user_id=user_id)
+            result = await user_services.get_user_by_id(db=db, user_id=user_id)
 
             assert result.id == user_id
             assert result.username == user[0].username
@@ -134,9 +134,9 @@ class TestUserCRUD:
     @pytest.mark.asyncio(scope="function")
     async def test_update_user(self, pydentic_update_data):
         async with AsyncSessionLocal() as db:
-            user = await users.get_user_list(db=db, limit=1, offset=0)
+            user = await user_services.get_user_list(db=db, limit=1, offset=0)
             user_id = user[0].id
-            result = await users.update_user(db=db, user_id=user_id, user_data=pydentic_update_data)
+            result = await user_services.update_user(db=db, user_id=user_id, user_data=pydentic_update_data)
 
             assert result.id == user_id
             assert result.username == pydentic_update_data.username
@@ -145,10 +145,10 @@ class TestUserCRUD:
     @pytest.mark.asyncio(scope="function")
     async def test_delete_user(self):
         async with AsyncSessionLocal() as db:
-            user = await users.get_user_list(db=db, limit=1, offset=0)
+            user = await user_services.get_user_list(db=db, limit=1, offset=0)
             user_id = user[0].id
-            await users.delete_user(db=db, user_id=user_id)
+            await user_services.delete_user(db=db, user_id=user_id)
 
-            result = await users.get_user_list(db=db, limit=10, offset=0)
+            result = await user_services.get_user_list(db=db, limit=10, offset=0)
 
             assert user not in result
