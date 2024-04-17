@@ -48,7 +48,7 @@ async def update_user(
     db: AsyncSession, user_id: UUID, user_data: users.UserUpdate
 ) -> UserBase:
     db_user = await get_user_by_id(db, user_id)
-    user_data = user_data.dict(exclude_unset=True)
+    user_data = user_data.model_dump(exclude_unset=True)
 
     if "password" in user_data:
         user_data["password"] = password_helper.hash_password(user_data["password"])
