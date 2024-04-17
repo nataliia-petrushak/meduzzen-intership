@@ -4,7 +4,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
 from dependencies import get_db
 from schemas.users import GetUser, UserDetail, UserSignUp, UserUpdate
 from crud import users
@@ -13,8 +12,10 @@ router = APIRouter(tags=["users"], prefix="/users")
 
 
 @router.get("/", response_model=List[GetUser])
-async def get_user_list(offset: int, limit: int, db: AsyncSession = Depends(get_db)):
-    return await users.get_all_users(db=db, offset=offset, limit=limit)
+async def get_user_list(
+    offset: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)
+):
+    return await users.get_user_list(db, offset=offset, limit=limit)
 
 
 @router.get("/{user_id}/", response_model=UserDetail)
