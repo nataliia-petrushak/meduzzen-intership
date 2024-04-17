@@ -16,55 +16,57 @@ class BaseRepository:
     def __init__(self, model: Base) -> None:
         self.model = model
 
-    async def get_user_list(
+    async def get_model_list(
         self, db: AsyncSession, offset: int = 0, limit: int = 10
     ) -> List[Base]:
         query = select(self.model).offset(offset).limit(limit)
-        users = await db.execute(query)
-        return [user[0] for user in users.fetchall()]
+        models = await db.execute(query)
+        return [model[0] for model in models.fetchall()]
 
-    async def get_user_by_id(self, db: AsyncSession, user_id: UUID) -> Base | None:
-        result = await db.execute(select(self.model).where(self.model.id == user_id))
-        user = result.scalars().one_or_none()
+    async def get_model_by_id(self, db: AsyncSession, model_id: UUID) -> Base | None:
+        result = await db.execute(select(self.model).where(self.model.id == model_id))
+        model = result.scalars().one_or_none()
 
-        if not user:
+        if not model:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User is not found"
             )
 
-        return user
+        return model
 
-    async def create_user(self, db: AsyncSession, user_data: BaseModel) -> Base:
+    async def create_model(self, db: AsyncSession, model_data: BaseModel) -> Base:
         query = insert(self.model).values(
-            username=user_data.username,
-            email=user_data.email,
-            password=password_helper.hash_password(user_data.password),
+            username=model_data.username,
+            email=model_data.email,
+            password=password_helper.hash_password(model_data.password),
         )
         result = await db.execute(query)
         await db.commit()
         logger.info(f"User {result.inserted_primary_key} has been created")
-        return {**user_data.model_dump(), "id": result.inserted_primary_key}
+        return {**model_data.model_dump(), "id": result.inserted_primary_key}
 
-    async def update_user(
-        self, db: AsyncSession, user_id: UUID, user_data: BaseModel
+    async def update_model(
+        self, db: AsyncSession, model_id: UUID, model_data: BaseModel
     ) -> Base:
-        db_user = await self.get_user_by_id(db, user_id)
-        user_data = user_data.model_dump(exclude_unset=True)
+        db_model = await self.get_model_by_id(db, model_id)
+        model_data = model_data.model_dump(exclude_unset=True)
 
-        if "password" in user_data:
-            user_data["password"] = password_helper.hash_password(user_data["password"])
+        if "password" in model_data:
+            model_data["password"] = password_helper.hash_password(
+                model_data["password"]
+            )
 
-        query = update(self.model).where(self.model.id == user_id).values(**user_data)
+        query = update(self.model).where(self.model.id == model_id).values(**model_data)
 
         await db.execute(query)
         await db.commit()
-        logger.info(f"User {db_user.id} has been updated")
-        return db_user
+        logger.info(f"User {db_model.id} has been updated")
+        return db_model
 
-    async def delete_user(self, db: AsyncSession, user_id: UUID) -> dict:
-        db_user = await self.get_user_by_id(db, user_id)
+    async def delete_model(self, db: AsyncSession, model_id: UUID) -> dict:
+        db_model = await self.get_model_by_id(db, model_id)
 
-        await db.execute(delete(self.model).where(self.model.id == user_id))
+        await db.execute(delete(self.model).where(self.model.id == model_id))
         await db.commit()
-        logger.info(f"User {db_user.id} has been deleted")
+        logger.info(f"User {db_model.id} has been deleted")
         return {"message": "User has been deleted successfully"}

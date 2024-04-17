@@ -15,26 +15,28 @@ router = APIRouter(tags=["users"], prefix="/users")
 async def get_user_list(
     offset: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)
 ):
-    return await user_services.get_user_list(db, offset=offset, limit=limit)
+    return await user_services.get_model_list(db, offset=offset, limit=limit)
 
 
 @router.get("/{user_id}/", response_model=UserDetail)
 async def get_user_by_id(user_id: UUID, db: AsyncSession = Depends(get_db)):
-    return await user_services.get_user_by_id(db, user_id=user_id)
+    return await user_services.get_model_by_id(db, model_id=user_id)
 
 
 @router.post("/", response_model=UserSignUp)
 async def create_user(user_data: UserSignUp, db: AsyncSession = Depends(get_db)):
-    return await user_services.create_user(user_data=user_data, db=db)
+    return await user_services.create_model(model_data=user_data, db=db)
 
 
 @router.patch("/{user_id}/", response_model=UserUpdate)
 async def update_user(
     user_id: UUID, user_data: UserUpdate, db: AsyncSession = Depends(get_db)
 ):
-    return await user_services.update_user(user_data=user_data, db=db, user_id=user_id)
+    return await user_services.update_model(
+        model_data=user_data, db=db, model_id=user_id
+    )
 
 
 @router.delete("/{user_id}/", response_model=dict)
 async def delete_user(user_id: UUID, db: AsyncSession = Depends(get_db)):
-    return await user_services.delete_user(user_id=user_id, db=db)
+    return await user_services.delete_model(model_id=user_id, db=db)

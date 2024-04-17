@@ -40,5 +40,7 @@ async def prepare_db():
 
 @pytest.fixture(scope="session")
 async def ac() -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         yield ac

@@ -56,12 +56,7 @@ class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
 
 
-class Settings(
-    AppSettings,
-    RedisSettings,
-    PostgresSettings,
-    TestDatabaseSettings
-):
+class Settings(AppSettings, RedisSettings, PostgresSettings, TestDatabaseSettings):
     pass
 
 
