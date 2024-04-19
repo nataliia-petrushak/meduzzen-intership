@@ -5,7 +5,7 @@ services:
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
     ports:
-      - 6000:6000
+      - 5433:5433
     env_file:
       - .env
     networks:
