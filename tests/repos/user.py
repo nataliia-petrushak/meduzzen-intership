@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import User
-from app.utils.common import UserNotFound
+from app.core.exceptions import UserNotFound
 from tests.conftest import AsyncSessionLocal
 from tests.constants import pydentic_update_data, pydentic_create_data, user_repo
 
