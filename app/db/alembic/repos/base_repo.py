@@ -1,10 +1,12 @@
 from uuid import UUID
 
+from pydantic import BaseModel
 from sqlalchemy import select, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.logger import logger
 from app.db.models import Base
-from app.utils.common import UserNotFound
+from app.core.exceptions import UserNotFound
 
 
 class BaseRepository:
@@ -25,19 +27,24 @@ class BaseRepository:
         model = result.scalar()
 
         if not model:
-            raise UserNotFound(object_id=model_id)
+            raise UserNotFound(model_name=self.model.__name__, object_id=model_id)
 
         return model
 
-    async def create_model(self, db: AsyncSession, model_data: dict) -> Base:
-        query = insert(self.model).values(**model_data).returning(self.model)
-        result = await db.execute(query)
+    async def create_model(self, db: AsyncSession, model_data: BaseModel) -> Base:
+        model_data = model_data.model_dump(exclude_unset=True)
+        result = await db.execute(
+            insert(self.model).values(**model_data).returning(self.model)
+        )
         await db.commit()
-        return result.scalars().one_or_none()
+        model = result.scalar()
+        logger.info(f"{self.model.__name__} {model.id} has been created")
+        return model
 
     async def update_model(
-        self, db: AsyncSession, model_id: UUID, model_data: dict
+        self, db: AsyncSession, model_id: UUID, model_data: BaseModel
     ) -> Base:
+        model_data = model_data.model_dump(exclude_unset=True)
         result = await db.execute(
             update(self.model)
             .where(self.model.id == model_id)
@@ -48,7 +55,9 @@ class BaseRepository:
         model = result.scalar()
 
         if not model:
-            raise UserNotFound(object_id=model_id)
+            raise UserNotFound(model_name=self.model.__name__, object_id=model_id)
+
+        logger.info(f"{self.model.__name__} {model.id} has been updated")
         return model
 
     async def delete_model(self, db: AsyncSession, model_id: UUID) -> Base:
@@ -57,6 +66,9 @@ class BaseRepository:
         )
         await db.commit()
         model = result.scalar()
+
         if not model:
-            raise UserNotFound(object_id=model_id)
+            raise UserNotFound(model_name=self.model.__name__, object_id=model_id)
+
+        logger.info(f"{self.model.__name__} {model.id} has been deleted")
         return model
