@@ -1,4 +1,3 @@
-
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,33 +10,27 @@ from app.db.alembic.repos.base_repo import BaseRepository
 
 class UserRepository(BaseRepository):
     def __init__(self):
-        super().__init__(UserBase)
+        super().__init__(User)
 
-    async def create_model(self, db: AsyncSession, model_data: UserSignUp) -> UserBase:
-        model_data = model_data.model_dump()
-        query = insert(self.model).values(**model_data)
-        result = await db.execute(query)
-        await db.commit()
-        logger.info(f"User {result.inserted_primary_key} has been created")
-        return {**model_data, "id": result.inserted_primary_key}
+    async def create_model(self, db: AsyncSession, model_data: UserSignUp) -> User:
+        model_data = model_data.model_dump(exclude_unset=True)
+        result = await BaseRepository.create_model(self, db=db, model_data=model_data)
+        logger.info(f"User {result.id} has been created")
+        return result
 
     async def update_model(
         self, db: AsyncSession, model_id: UUID, model_data: UserUpdate
     ) -> User:
         model_data = model_data.model_dump(exclude_unset=True)
-        model = await self.get_model_by_id(db=db, model_id=model_id)
-        query = update(self.model).where(self.model.id == model_id).values(**model_data)
+        result = await BaseRepository.update_model(
+            self, db=db, model_id=model_id, model_data=model_data
+        )
+        logger.info(f"User {model_id} has been updated")
+        return result
 
-        await db.execute(query)
-        await db.commit()
-        logger.info(f"User {model.id} has been updated")
-        return model
-
-    async def delete_model(self, db: AsyncSession, model_id: int) -> None:
-        model = await self.get_model_by_id(db=db, model_id=model_id)
-        await db.execute(delete(self.model).filter(self.model.id == model_id))
-        await db.commit()
-        logger.info(f"User {model.id} has been deleted")
+    async def delete_model(self, db: AsyncSession, model_id: UUID) -> None:
+        await BaseRepository.delete_model(self, db=db, model_id=model_id)
+        logger.info(f"User {model_id} has been deleted")
 
 
 user_repository = UserRepository()
