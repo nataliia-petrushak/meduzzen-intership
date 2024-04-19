@@ -3,7 +3,7 @@ import uuid
 from starlette import status
 from starlette.testclient import TestClient
 
-from tests.constants import user_signup_data, user_update_data
+from tests.constants import user_signup_data, user_update_data, user_bad_data
 
 
 def test_create_user_endpoint(client: TestClient) -> None:
@@ -13,7 +13,7 @@ def test_create_user_endpoint(client: TestClient) -> None:
 
 
 def test_can_not_create_user_with_bad_data(client: TestClient) -> None:
-    response = client.post("/users", json=user_signup_data.update({"name": "Ilona"}))
+    response = client.post("/users", json=user_bad_data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
