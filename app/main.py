@@ -6,7 +6,7 @@ from starlette.responses import JSONResponse
 
 from app.routers import health, user
 from app.config import settings
-from app.utils.common import UserNotFound
+from app.core.exceptions import UserNotFound, ObjectNotFound
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins)
@@ -14,12 +14,9 @@ app.include_router(health.router)
 app.include_router(user.router)
 
 
-@app.exception_handler(UserNotFound)
-async def user_not_found_handler(request: Request, exc: UserNotFound):
-    return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": f"User {exc.object_id} not found"},
-    )
+@app.exception_handler(ObjectNotFound)
+async def user_not_found_handler(request: Request, exc: ObjectNotFound):
+    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": exc.msg})
 
 
 if __name__ == "__main__":
