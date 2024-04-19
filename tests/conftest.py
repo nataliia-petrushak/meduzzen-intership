@@ -1,16 +1,17 @@
 from typing import AsyncGenerator
 
 import pytest
-from sqlalchemy import NullPool
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_session
+from sqlalchemy import NullPool, insert
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
-from db.models import Base
-
+from app.db.database import Base
+from app.db.models import User
 from app.main import app
-from dependencies import get_db
-from config import settings
+from app.dependencies import get_db
+from app.config import settings
+from tests.constants import payload
 
 async_engine = create_async_engine(settings.test_postgres_url, poolclass=NullPool)
 AsyncSessionLocal = sessionmaker(
@@ -28,10 +29,12 @@ async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
 app.dependency_overrides[get_db] = override_get_db
 
 
-@pytest.fixture(autouse=True, scope="session")
-async def prepare_db():
+@pytest.fixture(scope="session", autouse=True)
+async def prepare_database():
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await conn.execute(insert(User).values(payload))
+        await conn.commit()
     yield
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)

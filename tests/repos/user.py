@@ -1,15 +1,12 @@
-import pytest
+from uuid import UUID
 
-from db.alembic.repos.user_repo import UserRepository
+import pytest
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from schemas.users import UserSignUp, UserUpdate
+from app.db.models import User
 from tests.conftest import AsyncSessionLocal
-
-
-@pytest.fixture
-def user_repo() -> UserRepository:
-    return UserRepository()
+from tests.constants import pydentic_update_data, pydentic_create_data, user_repo
 
 
 @pytest.fixture

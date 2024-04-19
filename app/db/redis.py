@@ -1,5 +1,6 @@
+
 from redis.asyncio import ConnectionPool, Redis
-from config import settings
+from app.config import settings
 
 
 class DBRedisManager:

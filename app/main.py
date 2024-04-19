@@ -1,9 +1,10 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import health, user
-from config import settings
+from app.routers import health, user
+from app.config import settings
+from app.utils.common import UserNotFound
 
 app = FastAPI()
 

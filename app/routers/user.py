@@ -1,3 +1,4 @@
+
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -8,6 +9,10 @@ from schemas.users import GetUser, UserDetail, UserSignUp, UserUpdate
 from services.user import UserService
 from starlette import status
 
+from app.dependencies import get_db
+from app.schemas.users import GetUser, UserDetail, UserSignUp, UserUpdate
+from app.services.user import UserService
+
 router = APIRouter(tags=["users"], prefix="/users")
 
 
@@ -17,7 +22,7 @@ async def get_user_list(
     limit: int = 10,
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
-):
+) -> list[GetUser]:
     return await user_service.get_model_list(db=db, offset=offset, limit=limit)
 
 
@@ -26,7 +31,7 @@ async def get_user_by_id(
     user_id: UUID,
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
-):
+) -> GetUser:
     return await user_service.get_model_by_id(db=db, model_id=user_id)
 
 
@@ -35,7 +40,7 @@ async def create_user(
     user_data: UserSignUp,
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
-):
+) -> GetUser:
     return await user_service.create_model(model_data=user_data, db=db)
 
 
@@ -45,7 +50,7 @@ async def update_user(
     user_data: UserUpdate,
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
-):
+) -> GetUser:
     return await user_service.update_model(
         model_data=user_data, db=db, model_id=user_id
     )

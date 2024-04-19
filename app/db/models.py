@@ -1,9 +1,9 @@
-import uuid
 
+import uuid
 from sqlalchemy import String, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from db.database import Base
+from app.db.database import Base
 
 
 class IDBase(Base):
@@ -13,7 +13,7 @@ class IDBase(Base):
     )
 
 
-class UserBase(IDBase):
+class User(IDBase):
     __tablename__ = "user"
 
     username: Mapped[str] = mapped_column(String(20), nullable=False)

@@ -1,11 +1,12 @@
-from db.models import UserBase
-from db.alembic.repos.base_repo import BaseRepository
-from sqlalchemy import insert, update, delete
+
+from uuid import UUID
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from logger import logger
-
+from app.logger import logger
 from app.schemas.users import UserSignUp, UserUpdate
+from app.db.models import User
+from app.db.alembic.repos.base_repo import BaseRepository
 
 
 class UserRepository(BaseRepository):
@@ -21,8 +22,8 @@ class UserRepository(BaseRepository):
         return {**model_data, "id": result.inserted_primary_key}
 
     async def update_model(
-        self, db: AsyncSession, model_id: int, model_data: UserUpdate
-    ) -> UserBase:
+        self, db: AsyncSession, model_id: UUID, model_data: UserUpdate
+    ) -> User:
         model_data = model_data.model_dump(exclude_unset=True)
         model = await self.get_model_by_id(db=db, model_id=model_id)
         query = update(self.model).where(self.model.id == model_id).values(**model_data)
