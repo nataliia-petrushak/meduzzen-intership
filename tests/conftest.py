@@ -29,18 +29,23 @@ async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
 app.dependency_overrides[get_db] = override_get_db
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="function")
 async def prepare_database():
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        await conn.execute(insert(User).values(payload))
-        await conn.commit()
     yield
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
 
+@pytest.fixture(scope="function")
+async def fill_database():
+    async with async_engine.begin() as conn:
+        await conn.execute(insert(User).values(payload))
+        await conn.commit()
+
+
 @pytest.fixture(name="client", scope="session")
-def client():
+def client() -> TestClient:
     client = TestClient(app)
     yield client
