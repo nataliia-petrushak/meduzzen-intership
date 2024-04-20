@@ -2,17 +2,12 @@ services:
   test_db:
     image: "postgres:16-alpine"
     working_dir: "/code"
-    volumes:
-      - postgres_test_data:/var/lib/postgresql/data
     ports:
       - 5433:5433
     env_file:
       - .env
     networks:
       - network
-
-volumes:
-  postgres_test_data:
 
 networks:
   network:
