@@ -3,7 +3,7 @@ from uuid import UUID
 
 
 class ObjectNotFound(Exception):
-    def __init__(self, model_name: str, object_id: Any) -> None:
+    def __init__(self, object_id: Any, model_name: str = "Object") -> None:
         self.msg = f"{model_name} with given identifier - {object_id} not found"
         super().__init__(self.msg)
 
