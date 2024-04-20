@@ -1,4 +1,3 @@
-
 import uuid
 from sqlalchemy import String, UUID
 from sqlalchemy.orm import Mapped, mapped_column

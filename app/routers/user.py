@@ -1,12 +1,6 @@
-
 from uuid import UUID
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from dependencies import get_db
-from schemas.users import GetUser, UserDetail, UserSignUp, UserUpdate
-from services.user import UserService
 from starlette import status
 
 from app.dependencies import get_db

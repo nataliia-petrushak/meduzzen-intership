@@ -1,4 +1,3 @@
-
 from redis.asyncio import ConnectionPool, Redis
 from app.config import settings
 

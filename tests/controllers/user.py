@@ -1,5 +1,3 @@
-import uuid
-
 import pytest
 from starlette import status
 from starlette.testclient import TestClient
@@ -40,8 +38,7 @@ def test_get_user_by_id_endpoint(client: TestClient) -> None:
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["id"] == user_id
 
-    key_2 = uuid.uuid4()
-    response_2 = client.get(f"/users/{key_2}")
+    response_2 = client.get(f"/users/af3efcf6-9c61-4865-832f-5250f7fb8aec")
     assert response_2.status_code == status.HTTP_404_NOT_FOUND
 
 

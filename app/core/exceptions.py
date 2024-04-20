@@ -11,4 +11,3 @@ class ObjectNotFound(Exception):
 class UserNotFound(ObjectNotFound):
     def init(self, model_id: UUID, model_name: str = "User") -> None:
         super().__init__(model_name=model_name, object_id=model_id)
-

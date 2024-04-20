@@ -1,12 +1,9 @@
-
 from uuid import UUID
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import User
 from app.schemas.users import UserSignUp, UserUpdate
 from app.services.security import SecurityService
-
 from app.db.alembic.repos.user_repo import UserRepository
 
 
