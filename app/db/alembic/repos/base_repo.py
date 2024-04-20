@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from sqlalchemy import select, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.logger import logger
+from app.logger import custom_logger
 from app.db.models import Base
 from app.core.exceptions import UserNotFound
 
@@ -27,7 +27,7 @@ class BaseRepository:
         model = result.scalar()
 
         if not model:
-            raise UserNotFound(model_name=self.model.__name__, object_id=model_id)
+            raise UserNotFound(object_id=model_id)
 
         return model
 
@@ -38,7 +38,7 @@ class BaseRepository:
         )
         await db.commit()
         model = result.scalar()
-        logger.info(f"{self.model.__name__} {model.id} has been created")
+        custom_logger.info(f"{self.model.__name__} {model.id} has been created")
         return model
 
     async def update_model(
@@ -55,9 +55,9 @@ class BaseRepository:
         model = result.scalar()
 
         if not model:
-            raise UserNotFound(model_name=self.model.__name__, object_id=model_id)
+            raise UserNotFound(object_id=model_id)
 
-        logger.info(f"{self.model.__name__} {model.id} has been updated")
+        custom_logger.info(f"{self.model.__name__} {model.id} has been updated")
         return model
 
     async def delete_model(self, db: AsyncSession, model_id: UUID) -> Base:
@@ -68,7 +68,7 @@ class BaseRepository:
         model = result.scalar()
 
         if not model:
-            raise UserNotFound(model_name=self.model.__name__, object_id=model_id)
+            raise UserNotFound(object_id=model_id)
 
-        logger.info(f"{self.model.__name__} {model.id} has been deleted")
+        custom_logger.info(f"{self.model.__name__} {model.id} has been deleted")
         return model
