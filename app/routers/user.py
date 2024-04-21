@@ -25,7 +25,7 @@ async def get_user_by_id(
     user_id: UUID,
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
-) -> GetUser:
+) -> UserDetail:
     return await user_service.get_model_by_id(db=db, model_id=user_id)
 
 
@@ -34,7 +34,7 @@ async def create_user(
     user_data: UserSignUp,
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
-) -> GetUser:
+) -> UserSignUp:
     return await user_service.create_model(model_data=user_data, db=db)
 
 
@@ -44,7 +44,7 @@ async def update_user(
     user_data: UserUpdate,
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
-) -> GetUser:
+) -> UserUpdate:
     return await user_service.update_model(
         model_data=user_data, db=db, model_id=user_id
     )
