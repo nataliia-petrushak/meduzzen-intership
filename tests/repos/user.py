@@ -6,20 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import User
 from app.core.exceptions import UserNotFound
-from tests.conftest import AsyncSessionLocal
 from tests.constants import pydentic_update_data, pydentic_create_data, user_repo
-
-
-@pytest.fixture
-async def db(prepare_database, fill_database) -> AsyncSession:
-    async with AsyncSessionLocal() as session:
-        yield session
-
-
-@pytest.fixture
-async def user_id(db: AsyncSession) -> UUID:
-    user_id = await db.execute(select(User.id).limit(1))
-    return user_id.scalars().one_or_none()
 
 
 @pytest.mark.asyncio
@@ -31,7 +18,7 @@ async def test_add_user_func(db: AsyncSession) -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_user_list_func(db: AsyncSession) -> None:
+async def test_get_user_list_func(db: AsyncSession, fill_database) -> None:
     result = await user_repo.get_model_list(db=db, limit=10, offset=0)
 
     assert len(result) == 3
@@ -41,7 +28,9 @@ async def test_get_user_list_func(db: AsyncSession) -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_user_by_id_func(db: AsyncSession, user_id: UUID) -> None:
+async def test_get_user_by_id_func(
+    db: AsyncSession, user_id: UUID, fill_database
+) -> None:
     with pytest.raises(UserNotFound):
         await user_repo.get_model_by_id(
             db=db, model_id="af3efcf6-9c61-4865-832f-5250f7fb8aec"
@@ -55,7 +44,7 @@ async def test_get_user_by_id_func(db: AsyncSession, user_id: UUID) -> None:
 
 
 @pytest.mark.asyncio
-async def test_update_user(db: AsyncSession, user_id: UUID) -> None:
+async def test_update_user(db: AsyncSession, user_id: UUID, fill_database) -> None:
     with pytest.raises(UserNotFound):
         await user_repo.update_model(
             db=db,
@@ -73,13 +62,11 @@ async def test_update_user(db: AsyncSession, user_id: UUID) -> None:
 
 
 @pytest.mark.asyncio
-async def test_delete_user(db: AsyncSession, user_id: UUID) -> None:
+async def test_delete_user(db: AsyncSession, user_id: UUID, fill_database) -> None:
     with pytest.raises(UserNotFound):
         await user_repo.delete_model(
             db=db, model_id="af3efcf6-9c61-4865-832f-5250f7fb8aec"
         )
 
-    result = await db.execute(select(User, User.id).filter(User.id == user_id))
-    user = result.scalar()
-
-    assert user_id == user.id
+    result = await user_repo.delete_model(db=db, model_id=user_id)
+    assert user_id == result.id
