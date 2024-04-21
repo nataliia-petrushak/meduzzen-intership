@@ -1,7 +1,8 @@
 from typing import AsyncGenerator
+from uuid import UUID
 
 import pytest
-from sqlalchemy import NullPool, insert
+from sqlalchemy import NullPool, insert, select
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
@@ -43,6 +44,18 @@ async def fill_database():
     async with async_engine.begin() as conn:
         await conn.execute(insert(User).values(payload))
         await conn.commit()
+
+
+@pytest.fixture
+async def db(prepare_database) -> AsyncSession:
+    async with AsyncSessionLocal() as session:
+        yield session
+
+
+@pytest.fixture
+async def user_id(db: AsyncSession, fill_database) -> UUID:
+    user_id = await db.execute(select(User.id).limit(1))
+    return user_id.scalars().one_or_none()
 
 
 @pytest.fixture(name="client", scope="session")
