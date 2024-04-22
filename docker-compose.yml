@@ -18,6 +18,8 @@ services:
       - 8000:8000
     env_file:
       - .env
+    environment:
+      PYTHONPATH: "/code:/code/app"
     depends_on:
       - db
     networks:
@@ -42,4 +44,3 @@ volumes:
 networks:
   network:
     driver: bridge
-

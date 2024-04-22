@@ -1,5 +1,4 @@
 import uuid
-
 from sqlalchemy import String, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -13,9 +12,9 @@ class IDBase(Base):
     )
 
 
-class UserBase(IDBase):
+class User(IDBase):
     __tablename__ = "user"
 
     username: Mapped[str] = mapped_column(String(20), nullable=False)
-    email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(String(50), nullable=False)
+    email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(250), nullable=False)
