@@ -11,3 +11,9 @@ class ObjectNotFound(Exception):
 class UserNotFound(ObjectNotFound):
     def init(self, model_id: UUID, model_name: str = "User") -> None:
         super().__init__(model_name=model_name, object_id=model_id)
+
+
+class AuthorizationError(Exception):
+    def __init__(self, detail: str) -> None:
+        self.msg = f"Authorization failed: {detail}"
+        super().__init__(self.msg)
