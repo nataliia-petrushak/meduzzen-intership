@@ -10,14 +10,14 @@ from app.services.security import SecurityService
 security = HTTPBearer()
 
 
-def jwt_authenticate(token):
+def jwt_authenticate(token: str) -> dict | None:
     try:
         return SecurityService.decode_user_token(token)
     except jwt.exceptions.InvalidAlgorithmError:
         return None
 
 
-def auth0_authenticate(token):
+def auth0_authenticate(token: str) -> dict | None:
     try:
         return Auth0Service.verify(token)
     except AuthorizationError:
