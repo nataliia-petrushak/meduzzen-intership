@@ -20,7 +20,7 @@ async def login(
     return await auth_service.sign_in(db=db, user_data=user_data)
 
 
-@router.post("/me", response_model=UserSignUp, status_code=status.HTTP_200_OK)
+@router.get("/me", response_model=UserSignUp, status_code=status.HTTP_200_OK)
 async def get_user_account(
     payload: dict = Depends(authorize_user),
     db: AsyncSession = Depends(get_db),
