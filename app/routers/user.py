@@ -1,15 +1,12 @@
 from uuid import UUID
-from fastapi import APIRouter, Depends, Security
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.dependencies import get_db
-from app.schemas.auth import Token
-from app.schemas.users import GetUser, UserDetail, UserSignUp, UserUpdate, UserSignIn
-from app.services.auth import AuthService
+from app.schemas.users import GetUser, UserDetail, UserSignUp, UserUpdate
 from app.services.user import UserService
-from app.utils.auth import authorize_user
+
 
 router = APIRouter(tags=["users"], prefix="/users")
 
@@ -61,21 +58,3 @@ async def delete_user(
     user_service: UserService = Depends(UserService),
 ) -> None:
     return await user_service.delete_model(model_id=user_id, db=db)
-
-
-@router.post("/login", response_model=Token, status_code=status.HTTP_200_OK)
-async def login(
-    user_data: UserSignIn,
-    db: AsyncSession = Depends(get_db),
-    auth_service: AuthService = Depends(AuthService),
-) -> Token:
-    return await auth_service.sign_in(db=db, user_data=user_data)
-
-
-@router.post("/me", response_model=UserSignUp, status_code=status.HTTP_200_OK)
-async def get_user_account(
-    payload: dict = Depends(authorize_user),
-    db: AsyncSession = Depends(get_db),
-    auth_service: AuthService = Depends(AuthService),
-) -> UserSignUp:
-    return await auth_service.get_active_user(db=db, payload=payload)
