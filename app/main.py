@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
 from starlette.responses import JSONResponse
 
-from app.routers import health, user
+from app.routers import health, user, auth
 from app.config import settings
 from app.core.exceptions import ObjectNotFound, AuthorizationError
 
@@ -13,6 +13,7 @@ app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins)
 app.include_router(health.router)
 app.include_router(user.router)
+app.include_router(auth.router)
 
 
 @app.exception_handler(ObjectNotFound)
