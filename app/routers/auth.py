@@ -4,11 +4,20 @@ from starlette import status
 
 from app.dependencies import get_db
 from app.schemas.auth import Token
-from app.schemas.users import UserSignIn, UserSignUp
+from app.schemas.users import UserSignIn, GetUser, UserSignUp
 from app.services.auth import AuthService
-from app.utils.auth import authorize_user
+from app.utils.auth import get_authenticated_user
 
 router = APIRouter(tags=["auth"], prefix="/auth")
+
+
+@router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
+async def register(
+    user_data: UserSignUp,
+    db: AsyncSession = Depends(get_db),
+    auth_service: AuthService = Depends(AuthService),
+) -> Token:
+    return await auth_service.register(db=db, user_data=user_data)
 
 
 @router.post("/login", response_model=Token, status_code=status.HTTP_200_OK)
@@ -20,10 +29,8 @@ async def login(
     return await auth_service.sign_in(db=db, user_data=user_data)
 
 
-@router.get("/me", response_model=UserSignUp, status_code=status.HTTP_200_OK)
+@router.get("/me", response_model=GetUser, status_code=status.HTTP_200_OK)
 async def get_user_account(
-    payload: dict = Depends(authorize_user),
-    db: AsyncSession = Depends(get_db),
-    auth_service: AuthService = Depends(AuthService),
-) -> UserSignUp:
-    return await auth_service.get_active_user(db=db, payload=payload)
+    user: GetUser = Depends(get_authenticated_user)
+) -> GetUser:
+    return user
