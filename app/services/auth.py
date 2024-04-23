@@ -20,17 +20,7 @@ class AuthService:
             return Token(access_token=access_token, token_type="Bearer")
         raise AuthorizationError(detail="Incorrect credentials")
 
-    async def get_active_user(self, db: AsyncSession, payload: dict) -> UserSignUp:
-        user_email = payload["email"]
-        username = user_email.split("@")[0]
-
-        try:
-            user = await self._user_service.get_user_by_email(db=db, email=user_email)
-        except UserNotFound:
-            user = await self._user_service.create_model(
-                db=db,
-                model_data=UserSignUp(
-                    email=user_email, username=username, password=username
-                ),
-            )
-        return user
+    async def register(self, db: AsyncSession, user_data: UserSignUp) -> Token:
+        user = await self._user_service.create_model(db=db, model_data=user_data)
+        token = SecurityService.encode_user_token(email=user.email)
+        return Token(access_token=token, token_type="Bearer")
