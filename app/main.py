@@ -26,7 +26,7 @@ async def user_not_found_handler(request: Request, exc: ObjectNotFound):
 @app.exception_handler(AuthorizationError)
 async def authorization_error_handler(request: Request, exc: AuthorizationError):
     return JSONResponse(
-        status_code=status.HTTP_403_FORBIDDEN, content={"message": exc.msg}
+        status_code=status.HTTP_401_UNAUTHORIZED, content={"message": exc.msg}
     )
 
 
