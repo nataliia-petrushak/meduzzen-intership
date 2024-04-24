@@ -27,7 +27,7 @@ class BaseRepository:
         model = result.scalar()
 
         if not model:
-            raise UserNotFound(object_id=model_id)
+            raise UserNotFound(identifier=model_id)
 
         return model
 
@@ -55,7 +55,7 @@ class BaseRepository:
         model = result.scalar()
 
         if not model:
-            raise UserNotFound(object_id=model_id)
+            raise UserNotFound(identifier=model_id)
 
         custom_logger.info(f"{self.model.__name__} {model.id} has been updated")
         return model
@@ -68,7 +68,7 @@ class BaseRepository:
         model = result.scalar()
 
         if not model:
-            raise UserNotFound(object_id=model_id)
+            raise UserNotFound(identifier=model_id)
 
         custom_logger.info(f"{self.model.__name__} {model.id} has been deleted")
         return model

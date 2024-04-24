@@ -15,5 +15,5 @@ class UserRepository(BaseRepository):
         user = result.scalar()
 
         if not user:
-            raise UserNotFound(object_id=email)
+            raise UserNotFound(identifier=email)
         return user

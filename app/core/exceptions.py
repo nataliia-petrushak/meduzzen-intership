@@ -3,14 +3,14 @@ from uuid import UUID
 
 
 class ObjectNotFound(Exception):
-    def __init__(self, object_id: Any, model_name: str = "Object") -> None:
-        self.msg = f"{model_name} with given identifier - {object_id} not found"
+    def __init__(self, identifier: Any, model_name: str = "Object") -> None:
+        self.msg = f"{model_name} with {identifier} not found"
         super().__init__(self.msg)
 
 
 class UserNotFound(ObjectNotFound):
-    def init(self, model_id: UUID, model_name: str = "User") -> None:
-        super().__init__(model_name=model_name, object_id=model_id)
+    def init(self, identifier: UUID, model_name: str = "User") -> None:
+        super().__init__(model_name=model_name, identifier=identifier)
 
 
 class AuthorizationError(Exception):
