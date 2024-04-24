@@ -12,12 +12,12 @@ from app.services.user import UserService
 router = APIRouter(tags=["auth"], prefix="/auth")
 
 
-@router.post("/register", response_model=UserSignUp, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=GetUser, status_code=status.HTTP_201_CREATED)
 async def register(
     user_data: UserSignUp,
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
-) -> UserSignUp:
+) -> GetUser:
     return await user_service.create_model(db=db, model_data=user_data)
 
 
