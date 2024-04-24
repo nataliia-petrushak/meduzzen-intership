@@ -11,11 +11,8 @@ class Auth0Service:
 
         try:
             signing_key = jwt_client.get_signing_key_from_jwt(token).key
-        except jwt.exceptions.PyJWKClientError as error:
+        except (jwt.exceptions.PyJWKClientError, jwt.exceptions.DecodeError) as error:
             raise AuthorizationError(detail=str(error))
-        except jwt.exceptions.DecodeError as error:
-            raise AuthorizationError(detail=str(error))
-
         try:
             payload = jwt.decode(
                 token,
