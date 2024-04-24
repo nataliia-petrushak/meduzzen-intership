@@ -7,7 +7,7 @@ from app.core.exceptions import AuthorizationError, UserNotFound
 from app.dependencies import get_db
 from app.schemas.auth import Token
 from app.schemas.users import UserSignIn, UserSignUp, GetUser
-from app.services.security import SecurityService, Auth0Service
+from app.services.security import SecurityService, Auth0Security
 from app.services.user import UserService
 
 
@@ -55,7 +55,7 @@ class AuthBearer(HTTPBearer):
     @staticmethod
     def auth0_authenticate(credentials: str) -> dict | None:
         try:
-            return Auth0Service.verify(credentials)
+            return Auth0Security.verify(credentials)
         except AuthorizationError:
             return None
 
