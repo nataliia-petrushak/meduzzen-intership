@@ -5,6 +5,7 @@ from starlette import status
 
 from app.dependencies import get_db
 from app.schemas.users import GetUser, UserDetail, UserSignUp, UserUpdate
+from app.services.auth import get_authenticated_user
 from app.services.user import UserService
 
 
@@ -32,20 +33,20 @@ async def get_user_by_id(
 
 @router.patch("/{user_id}", response_model=UserUpdate, status_code=status.HTTP_200_OK)
 async def update_user(
-    user_id: UUID,
     user_data: UserUpdate,
+    user: GetUser = Depends(get_authenticated_user),
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
 ) -> UserUpdate:
     return await user_service.update_model(
-        model_data=user_data, db=db, model_id=user_id
+        model_data=user_data, db=db, model_id=user.id
     )
 
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(
-    user_id: UUID,
+@router.patch("/{user_id}/deactivate", status_code=status.HTTP_204_NO_CONTENT)
+async def deactivate_user(
+    user: GetUser = Depends(get_authenticated_user),
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
 ) -> None:
-    return await user_service.delete_model(model_id=user_id, db=db)
+    return await user_service.user_deactivate(user_id=user.id, db=db)
