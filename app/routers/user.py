@@ -7,6 +7,7 @@ from app.dependencies import get_db
 from app.schemas.users import GetUser, UserDetail, UserSignUp, UserUpdate
 from app.services.user import UserService
 
+
 router = APIRouter(tags=["users"], prefix="/users")
 
 
@@ -27,15 +28,6 @@ async def get_user_by_id(
     user_service: UserService = Depends(UserService),
 ) -> UserDetail:
     return await user_service.get_model_by_id(db=db, model_id=user_id)
-
-
-@router.post("/", response_model=UserSignUp, status_code=status.HTTP_201_CREATED)
-async def create_user(
-    user_data: UserSignUp,
-    db: AsyncSession = Depends(get_db),
-    user_service: UserService = Depends(UserService),
-) -> UserSignUp:
-    return await user_service.create_model(model_data=user_data, db=db)
 
 
 @router.patch("/{user_id}", response_model=UserUpdate, status_code=status.HTTP_200_OK)

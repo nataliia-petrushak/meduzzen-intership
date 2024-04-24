@@ -37,3 +37,6 @@ class UserService:
 
     async def delete_model(self, db: AsyncSession, model_id: UUID) -> None:
         await self._user_repo.delete_model(db, model_id=model_id)
+
+    async def get_user_by_email(self, db: AsyncSession, email: str) -> User:
+        return await self._user_repo.get_user_by_email(db=db, email=email)

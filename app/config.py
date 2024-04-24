@@ -43,6 +43,20 @@ class RedisSettings(BaseSettings):
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
 
 
+class AuthorizationSettings(BaseSettings):
+    AUTH0_CLIENT_ID: str
+    AUTH0_DOMAIN: str
+    AUTH0_IDENTIFIER: str
+    AUTH0_ISSUER: str
+    AUTH0_ALGORITHMS: str
+    JWT_SECRET: str
+    JWT_ALGORITHMS: str
+
+    @property
+    def auth_url(self) -> str:
+        return f"https://{self.AUTH0_DOMAIN}/.well-known/jwks.json"
+
+
 class AppSettings(BaseSettings):
     HOST: str
     PORT: int
@@ -55,7 +69,13 @@ class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
 
 
-class Settings(AppSettings, RedisSettings, PostgresSettings, TestDatabaseSettings):
+class Settings(
+    PostgresSettings,
+    TestDatabaseSettings,
+    RedisSettings,
+    AuthorizationSettings,
+    AppSettings,
+):
     pass
 
 
