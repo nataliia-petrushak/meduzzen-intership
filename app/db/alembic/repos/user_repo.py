@@ -1,4 +1,5 @@
-from sqlalchemy import select
+from uuid import UUID
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import UserNotFound
@@ -17,3 +18,13 @@ class UserRepository(BaseRepository):
         if not user:
             raise UserNotFound(identifier=email)
         return user
+
+    async def user_deactivate(self, db: AsyncSession, user_id: UUID) -> User:
+        result = await db.execute(
+            update(self.model)
+            .where(self.model.id == user_id)
+            .values(is_active=False)
+            .returning(self.model)
+        )
+        await db.commit()
+        return result.scalar()
