@@ -10,7 +10,7 @@ class UserRepository(BaseRepository):
     def __init__(self):
         super().__init__(User)
 
-    async def get_user_by_email(self, db: AsyncSession, email: str) -> User | None:
+    async def get_user_by_email(self, db: AsyncSession, email: str) -> User:
         result = await db.execute(select(self.model).filter(self.model.email == email))
         user = result.scalar()
 
