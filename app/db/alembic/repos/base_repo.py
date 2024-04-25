@@ -44,9 +44,8 @@ class BaseRepository:
         return model
 
     async def update_model(
-        self, db: AsyncSession, model_id: UUID, model_data: BaseModel
+        self, db: AsyncSession, model_id: UUID, model_data: dict
     ) -> Base:
-        model_data = model_data.model_dump(exclude_unset=True)
         result = await db.execute(
             update(self.model)
             .where(self.model.id == model_id)

@@ -29,7 +29,7 @@ class UserService:
     ) -> User:
         if model_data.password:
             model_data.password = SecurityService.hash_password(model_data.password)
-
+        model_data = model_data.model_dump(exclude_unset=True)
         result = await self._user_repo.update_model(
             db=db, model_id=model_id, model_data=model_data
         )
@@ -46,7 +46,7 @@ class UserService:
         return await self._user_repo.get_model_by_id(db, model_id=model_id)
 
     async def user_deactivate(self, db: AsyncSession, user_id: UUID) -> None:
-        await self._user_repo.user_deactivate(db=db, user_id=user_id)
+        await self._user_repo.update_model(db=db, model_id=user_id, model_data={"is_active": False})
 
     async def get_user_by_email(self, db: AsyncSession, email: str) -> User:
         return await self._user_repo.get_user_by_email(db=db, email=email)
