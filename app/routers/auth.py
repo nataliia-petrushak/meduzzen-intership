@@ -31,7 +31,5 @@ async def login(
 
 
 @router.get("/me", response_model=GetUser, status_code=status.HTTP_200_OK)
-async def get_user_account(
-    user: GetUser = Depends(get_authenticated_user)
-) -> GetUser:
+async def get_user_account(user: GetUser = Depends(get_authenticated_user)) -> GetUser:
     return user
