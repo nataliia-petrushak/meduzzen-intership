@@ -44,7 +44,7 @@ class BaseRepository:
         return model
 
     async def update_model(
-        self, db: AsyncSession, model_id: UUID, model_data: dict
+        self, db: AsyncSession, model_id: UUID, model_data: BaseModel
     ) -> Base:
         result = await db.execute(
             update(self.model)
