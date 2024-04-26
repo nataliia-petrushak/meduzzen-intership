@@ -1,16 +1,10 @@
 from typing import Any
-from uuid import UUID
 
 
 class ObjectNotFound(Exception):
-    def __init__(self, identifier: Any, model_name: str = "Object") -> None:
+    def __init__(self, identifier: Any, model_name: str) -> None:
         self.msg = f"{model_name} with {identifier} not found"
         super().__init__(self.msg)
-
-
-class UserNotFound(ObjectNotFound):
-    def init(self, identifier: UUID, model_name: str = "User") -> None:
-        super().__init__(model_name=model_name, identifier=identifier)
 
 
 class AuthorizationError(Exception):
@@ -21,5 +15,5 @@ class AuthorizationError(Exception):
 
 class AccessDeniedError(Exception):
     def __init__(self) -> None:
-        self.msg = f"Access denied: You do not have permission to modify or delete data"
+        self.msg = "Access denied: You do not have permission to modify or delete data"
         super().__init__(self.msg)

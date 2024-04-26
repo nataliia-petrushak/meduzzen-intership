@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.logger import custom_logger
 from app.db.models import Base
-from app.core.exceptions import UserNotFound
+from app.core.exceptions import ObjectNotFound
 
 
 class BaseRepository:
@@ -29,12 +29,11 @@ class BaseRepository:
         model = result.scalar()
 
         if not model:
-            raise UserNotFound(identifier=model_id)
+            raise ObjectNotFound(identifier=model_id, model_name=self.model.__name__)
 
         return model
 
     async def create_model(self, db: AsyncSession, model_data: BaseModel) -> Base:
-        model_data = model_data.model_dump(exclude_unset=True)
         result = await db.execute(
             insert(self.model).values(**model_data).returning(self.model)
         )
@@ -56,7 +55,7 @@ class BaseRepository:
         model = result.scalar()
 
         if not model:
-            raise UserNotFound(identifier=model_id)
+            raise ObjectNotFound(identifier=model_id, model_name=self.model.__name__)
 
         custom_logger.info(f"{self.model.__name__} {model.id} has been updated")
         return model
@@ -69,7 +68,7 @@ class BaseRepository:
         model = result.scalar()
 
         if not model:
-            raise UserNotFound(identifier=model_id)
+            raise ObjectNotFound(identifier=model_id, model_name=self.model.__name__)
 
         custom_logger.info(f"{self.model.__name__} {model.id} has been deleted")
         return model

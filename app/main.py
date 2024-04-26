@@ -16,7 +16,7 @@ app.include_router(auth.router)
 
 
 @app.exception_handler(ObjectNotFound)
-async def user_not_found_handler(request: Request, exc: ObjectNotFound):
+async def object_not_found_handler(request: Request, exc: ObjectNotFound):
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND, content={"message": exc.msg}
     )
