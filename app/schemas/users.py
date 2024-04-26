@@ -10,6 +10,7 @@ class UserBase(BaseModel):
 
 class GetUser(UserBase):
     id: UUID
+    is_active: bool
 
 
 class UserDetail(GetUser):
@@ -27,5 +28,4 @@ class UserSignUp(UserBase):
 
 class UserUpdate(BaseModel):
     username: str | None
-    email: EmailStr | None
     password: str | None

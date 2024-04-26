@@ -1,4 +1,5 @@
-from sqlalchemy import select
+from uuid import UUID
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import UserNotFound

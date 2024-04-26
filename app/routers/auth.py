@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from app.dependencies import get_db
+from app.db.database import get_db
 from app.schemas.auth import Token
 from app.schemas.users import UserSignIn, GetUser, UserSignUp
 from app.services.auth import AuthService, get_authenticated_user

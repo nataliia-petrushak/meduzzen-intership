@@ -10,7 +10,7 @@ from starlette.testclient import TestClient
 from app.db.database import Base
 from app.db.models import User
 from app.main import app
-from app.dependencies import get_db
+from app.db.database import get_db
 from app.config import settings
 from tests.constants import payload
 

@@ -1,8 +1,9 @@
-from sqlalchemy.ext.asyncio import AsyncSession
+from uuid import UUID
 
-from app.db.database import SessionLocal
+from app.core.exceptions import AccessDeniedError
+from app.schemas.users import GetUser
 
 
-async def get_db() -> AsyncSession:
-    async with SessionLocal() as db:
-        yield db
+async def check_permissions(user_id: UUID, user: GetUser) -> None:
+    if user_id != user.id:
+        raise AccessDeniedError()

@@ -14,9 +14,11 @@ class BaseRepository:
         self.model = model
 
     async def get_model_list(
-        self, db: AsyncSession, offset: int = 0, limit: int = 10
+        self, db: AsyncSession, offset: int = 0, limit: int = 10, filters: dict = None
     ) -> list[Base]:
         query = select(self.model).offset(offset).limit(limit)
+        if filters:
+            query = query.filter_by(**filters)
         models = await db.execute(query)
         return [model[0] for model in models.fetchall()]
 
@@ -44,7 +46,6 @@ class BaseRepository:
     async def update_model(
         self, db: AsyncSession, model_id: UUID, model_data: BaseModel
     ) -> Base:
-        model_data = model_data.model_dump(exclude_unset=True)
         result = await db.execute(
             update(self.model)
             .where(self.model.id == model_id)
