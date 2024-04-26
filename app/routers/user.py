@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.db.database import get_db
-from app.dependencies import check_permissions
 from app.schemas.users import GetUser, UserDetail, UserUpdate
 from app.services.auth import get_authenticated_user
 from app.services.user import UserService
@@ -40,9 +39,8 @@ async def update_user(
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
 ) -> UserUpdate:
-    await check_permissions(user_id=user_id, user=user)
     return await user_service.update_model(
-            model_data=user_data, db=db, model_id=user_id
+            model_data=user_data, db=db, model_id=user_id, user=user
         )
 
 
@@ -53,5 +51,4 @@ async def deactivate_user(
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
 ) -> None:
-    await check_permissions(user_id=user_id, user=user)
-    return await user_service.user_deactivate(user_id=user_id, db=db)
+    return await user_service.user_deactivate(user_id=user_id, db=db, user=user)
