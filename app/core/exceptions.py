@@ -7,6 +7,12 @@ class ObjectNotFound(Exception):
         super().__init__(self.msg)
 
 
+class NameExistError(Exception):
+    def __init__(self, model_name: str, name: str) -> None:
+        self.msg = f"The {model_name} with name: {name} already exists"
+        super().__init__(self.msg)
+
+
 class AuthorizationError(Exception):
     def __init__(self, detail: str) -> None:
         self.msg = f"Authorization failed: {detail}"
