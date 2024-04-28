@@ -27,7 +27,7 @@ class Company(IDBase):
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     owner_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), nullable=False,
     )
     description: Mapped[str] = mapped_column(String(500))
     is_hidden: Mapped[bool] = mapped_column(Boolean(), default=False)
