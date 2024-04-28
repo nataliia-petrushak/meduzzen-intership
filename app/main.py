@@ -6,7 +6,7 @@ from starlette.responses import JSONResponse
 
 from app.routers import health, user, auth, company
 from app.config import settings
-from app.core.exceptions import ObjectNotFound, AuthorizationError, AccessDeniedError
+from app.core.exceptions import ObjectNotFound, AuthorizationError, AccessDeniedError, NameExistError
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins)
@@ -20,6 +20,13 @@ app.include_router(company.router)
 async def object_not_found_handler(request: Request, exc: ObjectNotFound):
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND, content={"message": exc.msg}
+    )
+
+
+@app.exception_handler(NameExistError)
+async def name_exist_error_handler(request: Request, exc: NameExistError):
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": exc.msg}
     )
 
 
