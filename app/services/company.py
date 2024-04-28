@@ -46,6 +46,6 @@ class CompanyService:
     async def delete_model(
         self, db: AsyncSession, model_id: UUID, user: GetUser
     ) -> None:
-        company = await self._company_repo.get_model_by_id(db=db, model_id=model_id)
+        company = await self._company_repo.get_model_by(db=db, filter_={"id": model_id})
         check_permissions(user_id=company.owner_id, user=user)
         await self._company_repo.delete_model(db=db, model_id=model_id)
