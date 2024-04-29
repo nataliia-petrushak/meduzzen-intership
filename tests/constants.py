@@ -5,7 +5,12 @@ from app.db.alembic.repos.user_repo import UserRepository
 
 user_payload = [
     {"username": "owner", "password": "string", "email": "owner@test.com", "is_active": True},
-    {"username": "test_1", "password": "string", "email": "test_1@test.com", "is_active": True},
+    {
+        "username": "test_1",
+        "password": "$2b$12$J/goObyrDDIHS0rYyuyHvOKKAdTbaPE5W9zPbY0fH7sFM87/kjOuy",
+        "email": "test_1@test.com",
+        "is_active": True
+    },
     {"username": "test_2", "password": "string", "email": "test_2@test.com", "is_active": True},
     {"username": "test_3", "password": "string", "email": "test_3@test.com", "is_active": True},
     {"username": "test_4", "password": "string", "email": "test_4@test.com", "is_active": True}
