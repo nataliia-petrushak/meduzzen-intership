@@ -40,8 +40,8 @@ async def update_user(
     user_service: UserService = Depends(UserService),
 ) -> UserUpdate:
     return await user_service.update_model(
-            model_data=user_data, db=db, model_id=user_id, user=user
-        )
+        model_data=user_data, db=db, model_id=user_id, user=user
+    )
 
 
 @router.patch("/{user_id}/deactivate", status_code=status.HTTP_204_NO_CONTENT)

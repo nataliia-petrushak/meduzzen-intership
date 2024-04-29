@@ -3,7 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Request, Depends, Security
 
-from app.core.exceptions import AuthorizationError, UserNotFound
+from app.core.exceptions import AuthorizationError, ObjectNotFound
 from app.db.database import get_db
 from app.schemas.auth import Token
 from app.schemas.users import UserSignIn, UserSignUp, GetUser
@@ -75,7 +75,7 @@ async def get_authenticated_user(
 
     try:
         user = await user_service.get_user_by_email(db=db, email=user_email)
-    except UserNotFound:
+    except ObjectNotFound:
         user = await user_service.create_model(
             db=db,
             model_data=UserSignUp(
