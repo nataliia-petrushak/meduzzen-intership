@@ -1,9 +1,17 @@
 import uuid
+from enum import auto, Enum
 
-from sqlalchemy import String, UUID, Boolean, ForeignKey
+from sqlalchemy import String, UUID, Boolean, ForeignKey, UniqueConstraint
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
 from app.db.database import Base
+
+
+class Status(Enum):
+    JOIN_REQUEST = "JOIN_REQUEST"
+    INVITATION = "INVITATION"
+    MEMBER = "MEMBER"
 
 
 class IDBase(Base):
@@ -33,3 +41,19 @@ class Company(IDBase):
     is_hidden: Mapped[bool] = mapped_column(Boolean(), default=False)
 
     owner: Mapped[User] = Relationship("User", lazy="selectin")
+
+
+class Request(IDBase):
+    __tablename__ = "request"
+
+    status: Mapped[Status] = mapped_column(ENUM(Status, name="status"), nullable=False)
+    company_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("company.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), nullable=False
+    )
+
+    company: Mapped[Company] = Relationship("Company", lazy="selectin")
+    user: Mapped[User] = Relationship("User", lazy="selectin")
+    __table_args__ = (UniqueConstraint("company_id", "user_id", name="_user_company_uc"),)
