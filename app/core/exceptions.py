@@ -3,7 +3,7 @@ from typing import Any
 
 class ObjectNotFound(Exception):
     def __init__(self, identifier: Any, model_name: str) -> None:
-        self.msg = f"{model_name} with {identifier} not found"
+        self.msg = f"{model_name} with identifier - {identifier} not found"
         super().__init__(self.msg)
 
 
@@ -22,4 +22,11 @@ class AuthorizationError(Exception):
 class AccessDeniedError(Exception):
     def __init__(self) -> None:
         self.msg = "Access denied: You do not have permission to modify or delete data"
+        super().__init__(self.msg)
+
+
+class OwnerRequestError(Exception):
+    def __init__(self) -> None:
+        self.msg = ("The owner of the company cannot invite themselves "
+                    "and send join request to their companies.")
         super().__init__(self.msg)
