@@ -8,9 +8,13 @@ from tests.constants import company_data, company_payload, company_update_data
 
 
 @pytest.mark.asyncio
-async def test_create_company(client: TestClient, owner_token: str, prepare_database) -> None:
+async def test_create_company(
+    client: TestClient, owner_token: str, prepare_database
+) -> None:
     response = client.post(
-        "/companies", json=company_data, headers={"Authorization": f"Bearer {owner_token}"}
+        "/companies",
+        json=company_data,
+        headers={"Authorization": f"Bearer {owner_token}"},
     )
 
     assert response.status_code == status.HTTP_201_CREATED
@@ -20,7 +24,9 @@ async def test_create_company(client: TestClient, owner_token: str, prepare_data
 
 
 @pytest.mark.asyncio
-async def test_can_not_create_company_unauthorized(client: TestClient, prepare_database) -> None:
+async def test_can_not_create_company_unauthorized(
+    client: TestClient, prepare_database
+) -> None:
     response = client.post("/companies", json=company_data)
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -28,7 +34,7 @@ async def test_can_not_create_company_unauthorized(client: TestClient, prepare_d
 
 @pytest.mark.asyncio
 async def test_get_company_list(
-        client: TestClient, prepare_database, fill_database_with_companies
+    client: TestClient, prepare_database, fill_database_with_companies
 ) -> None:
     response = client.get("/companies")
     result = response.json()
@@ -41,7 +47,7 @@ async def test_get_company_list(
 
 @pytest.mark.asyncio
 async def test_get_company_by_id(
-        client: TestClient, company_id: UUID, prepare_database, fill_database_with_companies
+    client: TestClient, company_id: UUID, prepare_database, fill_database_with_companies
 ) -> None:
     response = client.get(f"/companies/{company_id}")
     result = response.json()
@@ -55,10 +61,10 @@ async def test_get_company_by_id(
 
 @pytest.mark.asyncio
 async def test_update_company_unauthorized(
-        client: TestClient,
-        company_id: UUID,
-        prepare_database,
-        fill_database_with_companies,
+    client: TestClient,
+    company_id: UUID,
+    prepare_database,
+    fill_database_with_companies,
 ) -> None:
     response = client.patch(f"/companies/{company_id}", json=company_update_data)
 
@@ -67,16 +73,16 @@ async def test_update_company_unauthorized(
 
 @pytest.mark.asyncio
 async def test_update_company_authorized_forbidden(
-        client: TestClient,
-        company_id: UUID,
-        owner_token: str,
-        prepare_database,
-        fill_database_with_companies,
+    client: TestClient,
+    company_id: UUID,
+    owner_token: str,
+    prepare_database,
+    fill_database_with_companies,
 ) -> None:
     response = client.patch(
         f"/companies/{company_id}",
         json=company_update_data,
-        headers={"Authorization": f"Bearer {owner_token}"}
+        headers={"Authorization": f"Bearer {owner_token}"},
     )
     result = response.json()
 
@@ -87,10 +93,10 @@ async def test_update_company_authorized_forbidden(
 
 @pytest.mark.asyncio
 async def test_delete_company_unauthorized_forbidden(
-        client: TestClient,
-        company_id: UUID,
-        prepare_database,
-        fill_database_with_companies,
+    client: TestClient,
+    company_id: UUID,
+    prepare_database,
+    fill_database_with_companies,
 ) -> None:
     response = client.delete(f"/companies/{company_id}")
 
@@ -99,11 +105,11 @@ async def test_delete_company_unauthorized_forbidden(
 
 @pytest.mark.asyncio
 async def test_delete_company_unauthorized(
-        client: TestClient,
-        company_id: UUID,
-        owner_token: str,
-        prepare_database,
-        fill_database_with_companies,
+    client: TestClient,
+    company_id: UUID,
+    owner_token: str,
+    prepare_database,
+    fill_database_with_companies,
 ) -> None:
     response = client.delete(
         f"/companies/{company_id}", headers={"Authorization": f"Bearer {owner_token}"}

@@ -9,7 +9,9 @@ from tests.constants import pydentic_update_data, pydentic_create_data, user_rep
 
 @pytest.mark.asyncio
 async def test_add_user_func(db: AsyncSession) -> None:
-    result = await user_repo.create_model(db=db, model_data=pydentic_create_data.model_dump())
+    result = await user_repo.create_model(
+        db=db, model_data=pydentic_create_data.model_dump()
+    )
 
     assert result.username == pydentic_create_data.username
     assert result.email == pydentic_create_data.email

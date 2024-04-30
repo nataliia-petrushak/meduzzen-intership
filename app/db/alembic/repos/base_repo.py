@@ -29,9 +29,7 @@ class BaseRepository:
         model = result.scalar()
         identifier = list(filters.values())[0]
         if not model:
-            raise ObjectNotFound(
-                identifier=identifier, model_name=self.model.__name__
-            )
+            raise ObjectNotFound(identifier=identifier, model_name=self.model.__name__)
 
         return model
 

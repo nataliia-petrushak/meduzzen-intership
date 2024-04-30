@@ -9,16 +9,16 @@ from tests.constants import company_payload
 
 @pytest.mark.asyncio
 async def test_user_create_join_request(
-        client: TestClient,
-        user_id: UUID,
-        company_id: UUID,
-        prepare_database,
-        fill_database_with_companies,
-        token
+    client: TestClient,
+    token: str,
+    user_id: UUID,
+    company_id: UUID,
+    prepare_database,
+    fill_database_with_companies,
 ) -> None:
     response = client.post(
         f"user/{user_id}/join-requests/{company_id}",
-        headers={"Authorization": f"Bearer {token}"}
+        headers={"Authorization": f"Bearer {token}"},
     )
 
     assert response.status_code == status.HTTP_201_CREATED
@@ -28,11 +28,11 @@ async def test_user_create_join_request(
 
 
 async def test_unauthorized_user_create_request_forbidden(
-        client: TestClient,
-        user_id: UUID,
-        company_id: UUID,
-        prepare_database,
-        fill_database_with_companies,
+    client: TestClient,
+    user_id: UUID,
+    company_id: UUID,
+    prepare_database,
+    fill_database_with_companies,
 ) -> None:
     response = client.post(
         f"user/{user_id}/join-requests/{company_id}",
@@ -43,16 +43,16 @@ async def test_unauthorized_user_create_request_forbidden(
 
 @pytest.mark.asyncio
 async def test_user_cancel_join_request(
-        client: TestClient,
-        request_id: UUID,
-        user_id: UUID,
-        prepare_database,
-        fill_db_with_join_requests,
-        token
+    client: TestClient,
+    token: str,
+    request_id: UUID,
+    user_id: UUID,
+    prepare_database,
+    fill_db_with_join_requests,
 ) -> None:
     response = client.delete(
         f"user/{user_id}/join-requests/{request_id}",
-        headers={"Authorization": f"Bearer {token}"}
+        headers={"Authorization": f"Bearer {token}"},
     )
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -60,11 +60,11 @@ async def test_user_cancel_join_request(
 
 @pytest.mark.asyncio
 async def test_unauthorized_user_cancel_request_forbidden(
-        client: TestClient,
-        request_id: UUID,
-        user_id: UUID,
-        prepare_database,
-        fill_db_with_join_requests,
+    client: TestClient,
+    request_id: UUID,
+    user_id: UUID,
+    prepare_database,
+    fill_db_with_join_requests,
 ) -> None:
     response = client.delete(
         f"user/{user_id}/join-requests/{request_id}"
@@ -75,16 +75,16 @@ async def test_unauthorized_user_cancel_request_forbidden(
 
 @pytest.mark.asyncio
 async def test_user_accept_invitation(
-        client: TestClient,
-        user_id: UUID,
-        invitation_id: UUID,
-        token: str,
-        prepare_database,
-        fill_db_with_invitations
+    client: TestClient,
+    user_id: UUID,
+    invitation_id: UUID,
+    token: str,
+    prepare_database,
+    fill_db_with_invitations,
 ) -> None:
     response = client.put(
         f"user/{user_id}/invitations/{invitation_id}",
-        headers={"Authorization": f"Bearer {token}"}
+        headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
 
@@ -96,16 +96,16 @@ async def test_user_accept_invitation(
 
 @pytest.mark.asyncio
 async def test_user_decline_invitation(
-        client: TestClient,
-        user_id: UUID,
-        invitation_id: UUID,
-        token: str,
-        prepare_database,
-        fill_db_with_invitations
+    client: TestClient,
+    user_id: UUID,
+    invitation_id: UUID,
+    token: str,
+    prepare_database,
+    fill_db_with_invitations,
 ) -> None:
     response = client.delete(
         f"user/{user_id}/invitations/{invitation_id}",
-        headers={"Authorization": f"Bearer {token}"}
+        headers={"Authorization": f"Bearer {token}"},
     )
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -113,15 +113,14 @@ async def test_user_decline_invitation(
 
 @pytest.mark.asyncio
 async def test_user_get_invitation_list(
-        client: TestClient,
-        user_id: UUID,
-        token: str,
-        prepare_database,
-        fill_db_with_invitations
+    client: TestClient,
+    user_id: UUID,
+    token: str,
+    prepare_database,
+    fill_db_with_invitations,
 ) -> None:
     response = client.get(
-        f"user/{user_id}/invitations",
-        headers={"Authorization": f"Bearer {token}"}
+        f"user/{user_id}/invitations", headers={"Authorization": f"Bearer {token}"}
     )
     result = response.json()
 
@@ -132,15 +131,14 @@ async def test_user_get_invitation_list(
 
 @pytest.mark.asyncio
 async def test_user_get_request_list(
-        client: TestClient,
-        user_id: UUID,
-        token: str,
-        prepare_database,
-        fill_db_with_join_requests
+    client: TestClient,
+    user_id: UUID,
+    token: str,
+    prepare_database,
+    fill_db_with_join_requests,
 ) -> None:
     response = client.get(
-        f"user/{user_id}/join-requests",
-        headers={"Authorization": f"Bearer {token}"}
+        f"user/{user_id}/join-requests", headers={"Authorization": f"Bearer {token}"}
     )
     result = response.json()
 
@@ -150,16 +148,16 @@ async def test_user_get_request_list(
 
 @pytest.mark.asyncio
 async def test_user_leave_company(
-        client: TestClient,
-        user_id: UUID,
-        company_id: UUID,
-        token: str,
-        prepare_database,
-        fill_db_with_members
+    client: TestClient,
+    user_id: UUID,
+    company_id: UUID,
+    token: str,
+    prepare_database,
+    fill_db_with_members,
 ) -> None:
     response = client.delete(
         f"user/{user_id}/leave/{company_id}",
-        headers={"Authorization": f"Bearer {token}"}
+        headers={"Authorization": f"Bearer {token}"},
     )
 
     assert response.status_code == status.HTTP_204_NO_CONTENT

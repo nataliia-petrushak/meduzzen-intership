@@ -27,6 +27,8 @@ class AccessDeniedError(Exception):
 
 class OwnerRequestError(Exception):
     def __init__(self) -> None:
-        self.msg = ("The owner of the company cannot invite themselves "
-                    "and send join request to their companies.")
+        self.msg = (
+            "The owner of the company cannot invite themselves "
+            "and send join request to their companies."
+        )
         super().__init__(self.msg)

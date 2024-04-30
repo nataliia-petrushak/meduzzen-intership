@@ -2,7 +2,6 @@ import pytest
 from starlette import status
 from starlette.testclient import TestClient
 
-from app.services.security import SecurityService
 from tests.constants import user_signup_data, user_bad_data
 
 
@@ -24,7 +23,9 @@ async def test_can_not_create_user_with_bad_data(
 
 @pytest.mark.asyncio
 async def test_user_login(client: TestClient, prepare_database, fill_database) -> None:
-    response = client.post("auth/login", json={"email": "test_1@test.com", "password": "string"})
+    response = client.post(
+        "auth/login", json={"email": "test_1@test.com", "password": "string"}
+    )
 
     assert response.status_code == status.HTTP_200_OK
     assert "access_token" in response.json()
@@ -32,7 +33,9 @@ async def test_user_login(client: TestClient, prepare_database, fill_database) -
 
 
 @pytest.mark.asyncio
-async def test_user_me(client: TestClient, token: str, prepare_database, fill_database) -> None:
+async def test_user_me(
+    client: TestClient, token: str, prepare_database, fill_database
+) -> None:
     response = client.get("auth/me", headers={"Authorization": f"Bearer {token}"})
     result = response.json()
 

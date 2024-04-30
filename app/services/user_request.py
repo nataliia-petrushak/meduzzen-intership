@@ -28,10 +28,12 @@ class UserRequestService:
         )
 
     async def user_send_join_request(
-            self, db: AsyncSession, user: GetUser, company_id: UUID, user_id: UUID
+        self, db: AsyncSession, user: GetUser, company_id: UUID, user_id: UUID
     ) -> GetRequest:
         check_permissions(user_id=user_id, user=user)
-        company = await self._company_repo.get_model_by(db=db, filters={"id": company_id})
+        company = await self._company_repo.get_model_by(
+            db=db, filters={"id": company_id}
+        )
         if user_id == company.owner_id:
             raise OwnerRequestError()
         model_data = {"user_id": user_id, "company_id": company_id, "status": "JOIN_REQUEST"}
@@ -39,7 +41,7 @@ class UserRequestService:
             db=db, model_data=model_data)
 
     async def user_cancel_request(
-            self, db: AsyncSession, user: GetUser, user_id: UUID, request_id: UUID
+        self, db: AsyncSession, user: GetUser, user_id: UUID, request_id: UUID
     ) -> None:
         check_permissions(user_id=user_id, user=user)
         return await self._request_repo.delete_model(db=db, model_id=request_id)
@@ -59,7 +61,7 @@ class UserRequestService:
         )
 
     async def user_leave_company(
-            self, db: AsyncSession, user_id: UUID, user: GetUser, company_id: UUID
+        self, db: AsyncSession, user_id: UUID, user: GetUser, company_id: UUID
     ) -> None:
         check_permissions(user_id=user_id, user=user)
         company = await self._request_repo.get_model_by(

@@ -88,8 +88,7 @@ async def fill_db_with_invitations(user_id, fill_database_with_companies):
 @pytest.fixture
 async def invitation_id(db: AsyncSession, fill_db_with_invitations, company_id) -> UUID:
     invitation_id = await db.execute(
-        select(Request.id)
-        .filter(Request.company_id == company_id)
+        select(Request.id).filter(Request.company_id == company_id)
     )
     return invitation_id.scalars().one_or_none()
 

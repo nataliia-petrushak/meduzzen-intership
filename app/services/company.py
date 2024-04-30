@@ -16,7 +16,9 @@ class CompanyService:
         self, db: AsyncSession, model_data: CompanyCreate, user: GetUser
     ) -> GetCompany:
         try:
-            await self._company_repo.get_model_by(db=db, filters={"name": model_data.name})
+            await self._company_repo.get_model_by(
+                db=db, filters={"name": model_data.name}
+            )
             raise NameExistError(model_name="company", name=model_data.name)
         except ObjectNotFound:
             model_data = model_data.model_dump()

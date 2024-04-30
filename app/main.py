@@ -11,7 +11,7 @@ from app.core.exceptions import (
     AuthorizationError,
     AccessDeniedError,
     NameExistError,
-    OwnerRequestError
+    OwnerRequestError,
 )
 
 app = FastAPI()

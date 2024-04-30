@@ -17,7 +17,9 @@ async def test_add_company_func(db: AsyncSession, user_id: UUID) -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_company_list_func(db: AsyncSession, fill_database_with_companies) -> None:
+async def test_get_company_list_func(
+    db: AsyncSession, fill_database_with_companies
+) -> None:
     result = await company_repo.get_model_list(db=db, limit=10, offset=0)
 
     assert len(result) == 3
@@ -43,7 +45,7 @@ async def test_get_company_by_id_func(
 
 @pytest.mark.asyncio
 async def test_update_company(
-        db: AsyncSession, company_id: UUID, fill_database_with_companies
+    db: AsyncSession, company_id: UUID, fill_database_with_companies
 ) -> None:
     with pytest.raises(ObjectNotFound):
         await company_repo.update_model(
@@ -61,7 +63,9 @@ async def test_update_company(
 
 
 @pytest.mark.asyncio
-async def test_delete_company(db: AsyncSession, company_id: UUID, fill_database_with_companies) -> None:
+async def test_delete_company(
+    db: AsyncSession, company_id: UUID, fill_database_with_companies
+) -> None:
     with pytest.raises(ObjectNotFound):
         await company_repo.delete_model(
             db=db, model_id="af3efcf6-9c61-4865-832f-5250f7fb8aec"

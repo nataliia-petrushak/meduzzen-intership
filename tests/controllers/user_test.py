@@ -2,7 +2,12 @@ from uuid import UUID
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from tests.constants import user_signup_data, user_update_data, user_bad_data, user_payload
+from tests.constants import (
+    user_signup_data,
+    user_update_data,
+    user_bad_data,
+    user_payload,
+)
 
 
 async def test_get_user_list_endpoint(
@@ -32,7 +37,9 @@ async def test_update_user_endpoint(
     client: TestClient, user_id: UUID, prepare_database, fill_database, token
 ) -> None:
     response = client.patch(
-        f"users/{user_id}", json=user_update_data, headers={"Authorization": f"Bearer {token}"}
+        f"users/{user_id}",
+        json=user_update_data,
+        headers={"Authorization": f"Bearer {token}"},
     )
 
     assert response.status_code == status.HTTP_200_OK
