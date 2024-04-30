@@ -319,6 +319,23 @@ async def test_owner_assign_admin(
 
 
 @pytest.mark.asyncio
+async def test_owner_assign_admin_as_member(
+        client: TestClient,
+        company_id: UUID,
+        user_id: UUID,
+        owner_token: str,
+        prepare_database,
+        fill_db_with_admins,
+) -> None:
+    response = client.patch(
+        f"company/{company_id}/admins/{user_id}",
+        headers={"Authorization": f"Bearer {owner_token}"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json().get("request_type") == "member"
+
+
+@pytest.mark.asyncio
 async def test_owner_assign_not_member_as_admin_forbidden(
         client: TestClient,
         company_id: UUID,

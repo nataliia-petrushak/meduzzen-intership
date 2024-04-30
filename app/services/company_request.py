@@ -110,7 +110,8 @@ class CompanyRequestService:
             db: AsyncSession,
             company_id: UUID,
             user_id: UUID,
-            user: GetUser
+            user: GetUser,
+            request_type: str = "admin"
     ) -> GetRequest:
         company = await self._company_repo.get_model_by(
             db=db, filters={"id": company_id}
@@ -119,10 +120,10 @@ class CompanyRequestService:
         request = await self._request_repo.get_model_by(
             db=db, filters={"user_id": user_id, "company_id": company_id}
         )
-        if request.request_type != RequestType.member:
+        if request.request_type in [RequestType.join_request, RequestType.invitation]:
             raise AssignError(identifier=request.user_id)
         return await self._request_repo.update_model(
-            db=db, model_id=request.id, model_data={"request_type": "admin"}
+            db=db, model_id=request.id, model_data={"request_type": request_type}
         )
 
     async def company_admin_list(

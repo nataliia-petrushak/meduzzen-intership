@@ -169,6 +169,21 @@ async def company_assign_member_as_admin(
     )
 
 
+@router.patch(
+    "/{company_id}/admins/{user_id}", status_code=status.HTTP_200_OK
+)
+async def company_assign_admin_as_member(
+        company_id: UUID,
+        user_id: UUID,
+        user: GetUser = Depends(get_authenticated_user),
+        db: AsyncSession = Depends(get_db),
+        request_service: CompanyRequestService = Depends(CompanyRequestService)
+) -> GetRequest:
+    return await request_service.company_change_member_role(
+        db=db, company_id=company_id, user_id=user_id, user=user, request_type="member"
+    )
+
+
 @router.get("/{company_id}/admins", response_model=list[GetUser], status_code=status.HTTP_200_OK)
 async def company_get_admin_list(
         company_id: UUID,
