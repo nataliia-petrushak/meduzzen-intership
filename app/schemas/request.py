@@ -1,11 +1,11 @@
 from uuid import UUID
 from pydantic import BaseModel
 
-from app.db.models import Status
+from app.db.models import RequestType
 
 
 class RequestBase(BaseModel):
-    status: Status
+    request_type: RequestType
 
 
 class GetRequest(RequestBase):

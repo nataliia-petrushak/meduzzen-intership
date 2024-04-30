@@ -24,7 +24,7 @@ class UserRequestService:
     ) -> GetRequest:
         check_permissions(user_id=user_id, user=user)
         return await self._request_repo.update_model(
-            db=db, model_id=model_id, model_data={"status": "MEMBER"}
+            db=db, model_id=model_id, model_data={"request_type": "member"}
         )
 
     async def user_send_join_request(
@@ -36,9 +36,12 @@ class UserRequestService:
         )
         if user_id == company.owner_id:
             raise OwnerRequestError()
-        model_data = {"user_id": user_id, "company_id": company_id, "status": "JOIN_REQUEST"}
-        return await self._request_repo.create_model(
-            db=db, model_data=model_data)
+        model_data = {
+            "user_id": user_id,
+            "company_id": company_id,
+            "request_type": "join_request",
+        }
+        return await self._request_repo.create_model(db=db, model_data=model_data)
 
     async def user_cancel_request(
         self, db: AsyncSession, user: GetUser, user_id: UUID, request_id: UUID
@@ -47,17 +50,21 @@ class UserRequestService:
         return await self._request_repo.delete_model(db=db, model_id=request_id)
 
     async def get_user_requests(
-            self,
-            db: AsyncSession,
-            user_id: UUID,
-            user: GetUser,
-            limit: int = 10,
-            offset: int = 0,
-            status: str = "INVITATION"
+        self,
+        db: AsyncSession,
+        user_id: UUID,
+        user: GetUser,
+        limit: int = 10,
+        offset: int = 0,
+        request_type: str = "invitation",
     ) -> list[GetCompany]:
         check_permissions(user_id=user_id, user=user)
         return await self._request_repo.request_list(
-            db=db, limit=limit, offset=offset, user_id=user_id, status=status
+            db=db,
+            limit=limit,
+            offset=offset,
+            user_id=user_id,
+            request_type=request_type,
         )
 
     async def user_leave_company(

@@ -79,9 +79,15 @@ async def fill_db_with_invitations(user_id, fill_database_with_companies):
     async with async_engine.begin() as conn:
         companies = await conn.execute(select(Company))
         for company in companies:
-            await conn.execute(insert(Request).values(
-                {"user_id": user_id, "company_id": company.id, "status": "INVITATION"}
-            ))
+            await conn.execute(
+                insert(Request).values(
+                    {
+                        "user_id": user_id,
+                        "company_id": company.id,
+                        "request_type": "invitation",
+                    }
+                )
+            )
         await conn.commit()
 
 
@@ -98,18 +104,21 @@ async def fill_db_with_join_requests(company_id, fill_database_with_companies):
     async with async_engine.begin() as conn:
         users = await conn.execute(select(User))
         for user in users:
-            await conn.execute(insert(Request).values(
-                {"user_id": user.id, "company_id": company_id, "status": "JOIN_REQUEST"}
-            ))
+            await conn.execute(
+                insert(Request).values(
+                    {
+                        "user_id": user.id,
+                        "company_id": company_id,
+                        "request_type": "join_request",
+                    }
+                )
+            )
         await conn.commit()
 
 
 @pytest.fixture
 async def request_id(db: AsyncSession, fill_db_with_join_requests, user_id) -> UUID:
-    request_id = await db.execute(
-        select(Request.id)
-        .filter(Request.user_id == user_id)
-    )
+    request_id = await db.execute(select(Request.id).filter(Request.user_id == user_id))
     return request_id.scalars().one_or_none()
 
 
@@ -118,9 +127,15 @@ async def fill_db_with_members(company_id, fill_database_with_companies):
     async with async_engine.begin() as conn:
         users = await conn.execute(select(User))
         for user in users:
-            await conn.execute(insert(Request).values(
-                {"user_id": user.id, "company_id": company_id, "status": "MEMBER"}
-            ))
+            await conn.execute(
+                insert(Request).values(
+                    {
+                        "user_id": user.id,
+                        "company_id": company_id,
+                        "request_type": "member",
+                    }
+                )
+            )
         await conn.commit()
 
 

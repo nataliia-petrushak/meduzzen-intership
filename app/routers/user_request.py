@@ -14,7 +14,7 @@ from app.services.user_request import UserRequestService
 router = APIRouter(tags=["user_request"], prefix="/user")
 
 
-@router.put(
+@router.patch(
     "/{user_id}/invitations/{invitation_id}",
     response_model=GetRequest,
     status_code=status.HTTP_200_OK,
@@ -110,7 +110,12 @@ async def user_join_request_list(
     limit: int = 10,
 ) -> list[GetCompany]:
     return await request_service.get_user_requests(
-        db=db, user_id=user_id, offset=offset, limit=limit, user=user, status="JOIN_REQUEST"
+        db=db,
+        user_id=user_id,
+        offset=offset,
+        limit=limit,
+        user=user,
+        request_type="join_request",
     )
 
 

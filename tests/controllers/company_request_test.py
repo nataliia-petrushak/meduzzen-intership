@@ -22,7 +22,7 @@ async def test_owner_create_company_invitation(
     )
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json()["status"] == "INVITATION"
+    assert response.json()["request_type"] == "invitation"
     assert response.json()["user_id"] == str(user_id)
     assert response.json()["company_id"] == str(company_id)
 
@@ -104,14 +104,14 @@ async def test_owner_accept_join_request(
     prepare_database,
     fill_db_with_join_requests,
 ) -> None:
-    response = client.put(
+    response = client.patch(
         f"company/{company_id}/join-request/{request_id}",
         headers={"Authorization": f"Bearer {owner_token}"},
     )
     result = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert result["status"] == "MEMBER"
+    assert result["request_type"] == "member"
     assert result["company_id"] == str(company_id)
     assert result["id"] == str(request_id)
 
@@ -125,11 +125,10 @@ async def test_user_accept_join_request_forbidden(
     prepare_database,
     fill_db_with_join_requests,
 ) -> None:
-    response = client.put(
+    response = client.patch(
         f"company/{company_id}/join-request/{request_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
-    result = response.json()
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
 

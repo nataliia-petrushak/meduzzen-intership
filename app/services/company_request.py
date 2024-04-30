@@ -28,10 +28,12 @@ class CompanyRequestService:
         check_permissions(user_id=company.owner_id, user=user)
         if user_id == company.owner_id:
             raise OwnerRequestError()
-        model_data = {"company_id": company_id, "user_id": user_id, "status": "INVITATION"}
-        return await self._request_repo.create_model(
-            db=db, model_data=model_data
-        )
+        model_data = {
+            "company_id": company_id,
+            "user_id": user_id,
+            "request_type": "invitation",
+        }
+        return await self._request_repo.create_model(db=db, model_data=model_data)
 
     async def company_cancel_request(
         self, db: AsyncSession, model_id: UUID, company_id: UUID, user: GetUser
@@ -50,24 +52,28 @@ class CompanyRequestService:
         )
         check_permissions(user_id=company.owner_id, user=user)
         return await self._request_repo.update_model(
-            db=db, model_id=join_request_id, model_data={"status": "MEMBER"}
+            db=db, model_id=join_request_id, model_data={"request_type": "member"}
         )
 
     async def get_company_requests(
-            self,
-            db: AsyncSession,
-            company_id: UUID,
-            user: GetUser,
-            offset: int = 0,
-            limit: int = 10,
-            status: str = "INVITATION"
+        self,
+        db: AsyncSession,
+        company_id: UUID,
+        user: GetUser,
+        offset: int = 0,
+        limit: int = 10,
+        request_type: str = "invitation",
     ) -> list[GetUser]:
         company = await self._company_repo.get_model_by(
             db=db, filters={"id": company_id}
         )
         check_permissions(user_id=company.owner_id, user=user)
         return await self._request_repo.request_list(
-            db=db, offset=offset, limit=limit, company_id=company_id, status=status
+            db=db,
+            offset=offset,
+            limit=limit,
+            company_id=company_id,
+            request_type=request_type,
         )
 
     async def get_company_members(
@@ -80,7 +86,7 @@ class CompanyRequestService:
         return await self._request_repo.request_list(
             db=db,
             company_id=company_id,
-            status="MEMBER",
+            request_type="member",
             offset=offset,
             limit=limit,
         )

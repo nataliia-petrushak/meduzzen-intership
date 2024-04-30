@@ -22,7 +22,7 @@ async def test_user_create_join_request(
     )
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json()["status"] == "JOIN_REQUEST"
+    assert response.json()["request_type"] == "join_request"
     assert response.json()["user_id"] == str(user_id)
     assert response.json()["company_id"] == str(company_id)
 
@@ -66,9 +66,7 @@ async def test_unauthorized_user_cancel_request_forbidden(
     prepare_database,
     fill_db_with_join_requests,
 ) -> None:
-    response = client.delete(
-        f"user/{user_id}/join-requests/{request_id}"
-    )
+    response = client.delete(f"user/{user_id}/join-requests/{request_id}")
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -82,14 +80,14 @@ async def test_user_accept_invitation(
     prepare_database,
     fill_db_with_invitations,
 ) -> None:
-    response = client.put(
+    response = client.patch(
         f"user/{user_id}/invitations/{invitation_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert result["status"] == "MEMBER"
+    assert result["request_type"] == "member"
     assert result["user_id"] == str(user_id)
     assert result["id"] == str(invitation_id)
 

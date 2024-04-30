@@ -48,7 +48,7 @@ async def company_cancel_invitation(
     )
 
 
-@router.put(
+@router.patch(
     "/{company_id}/join-request/{join_request_id}",
     response_model=GetRequest,
     status_code=status.HTTP_200_OK,
@@ -133,7 +133,7 @@ async def company_join_request_list(
         db=db,
         company_id=company_id,
         user=user,
-        status="JOIN_REQUEST",
+        request_type="join_request",
         offset=offset,
         limit=limit,
     )
