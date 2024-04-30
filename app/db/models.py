@@ -8,10 +8,10 @@ from sqlalchemy.orm import Mapped, mapped_column, Relationship
 from app.db.database import Base
 
 
-class Status(Enum):
-    JOIN_REQUEST = "JOIN_REQUEST"
-    INVITATION = "INVITATION"
-    MEMBER = "MEMBER"
+class RequestType(Enum):
+    join_request = "join_request"
+    invitation = "invitation"
+    member = "member"
 
 
 class IDBase(Base):
@@ -35,7 +35,9 @@ class Company(IDBase):
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     owner_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), nullable=False,
+        UUID(as_uuid=True),
+        ForeignKey("user.id", ondelete="CASCADE"),
+        nullable=False,
     )
     description: Mapped[str] = mapped_column(String(500))
     is_hidden: Mapped[bool] = mapped_column(Boolean(), default=False)
@@ -46,7 +48,9 @@ class Company(IDBase):
 class Request(IDBase):
     __tablename__ = "request"
 
-    status: Mapped[Status] = mapped_column(ENUM(Status, name="status"), nullable=False)
+    request_type: Mapped[RequestType] = mapped_column(
+        ENUM(RequestType, name="request_type"), nullable=False
+    )
     company_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("company.id", ondelete="CASCADE"), nullable=False
     )
@@ -56,4 +60,3 @@ class Request(IDBase):
 
     company: Mapped[Company] = Relationship("Company", lazy="selectin")
     user: Mapped[User] = Relationship("User", lazy="selectin")
-    __table_args__ = (UniqueConstraint("company_id", "user_id", name="_user_company_uc"),)
