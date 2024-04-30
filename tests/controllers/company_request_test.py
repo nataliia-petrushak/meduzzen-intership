@@ -299,3 +299,70 @@ async def test_user_delete_member_forbidden(
     )
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.asyncio
+async def test_owner_assign_admin(
+        client: TestClient,
+        company_id: UUID,
+        user_id: UUID,
+        owner_token: str,
+        prepare_database,
+        fill_db_with_members,
+) -> None:
+    response = client.patch(
+        f"company/{company_id}/members/{user_id}",
+        headers={"Authorization": f"Bearer {owner_token}"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json().get("request_type") == "admin"
+
+
+@pytest.mark.asyncio
+async def test_owner_assign_not_member_as_admin_forbidden(
+        client: TestClient,
+        company_id: UUID,
+        user_id: UUID,
+        owner_token: str,
+        prepare_database,
+        fill_db_with_invitations,
+) -> None:
+    response = client.patch(
+        f"company/{company_id}/members/{user_id}",
+        headers={"Authorization": f"Bearer {owner_token}"},
+    )
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+
+@pytest.mark.asyncio
+async def test_user_assign_member_as_admin_forbidden(
+        client: TestClient,
+        company_id: UUID,
+        user_id: UUID,
+        token: str,
+        prepare_database,
+        fill_db_with_invitations,
+) -> None:
+    response = client.patch(
+        f"company/{company_id}/members/{user_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.asyncio
+async def test_company_admin_list(
+        client: TestClient,
+        company_id: UUID,
+        prepare_database,
+        fill_db_with_admins
+) -> None:
+    response = client.get(f"company/{company_id}/admins")
+
+    result = response.json()
+
+    assert response.status_code == status.HTTP_200_OK
+    assert len(result) == 5
+    assert result[0]["username"] == user_payload[0]["username"]
+    assert result[1]["username"] == user_payload[1]["username"]
+    assert result[2]["username"] == user_payload[2]["username"]

@@ -149,6 +149,23 @@ async def member_id(db: AsyncSession, fill_db_with_members, user_id) -> UUID:
     return member_id.scalars().one_or_none()
 
 
+@pytest.fixture(scope="function")
+async def fill_db_with_admins(company_id, fill_database_with_companies):
+    async with async_engine.begin() as conn:
+        users = await conn.execute(select(User))
+        for user in users:
+            await conn.execute(
+                insert(Request).values(
+                    {
+                        "user_id": user.id,
+                        "company_id": company_id,
+                        "request_type": "admin",
+                    }
+                )
+            )
+        await conn.commit()
+
+
 @pytest.fixture
 async def db(prepare_database) -> AsyncSession:
     async with AsyncSessionLocal() as session:
