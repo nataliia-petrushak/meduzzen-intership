@@ -32,3 +32,9 @@ class OwnerRequestError(Exception):
             "and send join request to their companies."
         )
         super().__init__(self.msg)
+
+
+class AssignError(Exception):
+    def __init__(self, identifier: Any) -> None:
+        self.msg = f"You can`t assign user with {identifier} for this position"
+        super().__init__(self.msg)
