@@ -12,6 +12,7 @@ class RequestType(Enum):
     join_request = "join_request"
     invitation = "invitation"
     member = "member"
+    admin = "admin"
 
 
 class IDBase(Base):
