@@ -19,17 +19,15 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-def _get_request_type() -> ENUM:
-    return ENUM("invitation", "join_request", "member", name="request_type")
-
-
 def upgrade() -> None:
-    request_type = _get_request_type()
-    request_type.create(op.get_bind())
     op.create_table(
         "request",
         sa.Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
-        sa.Column("request_type", request_type, nullable=False),
+        sa.Column(
+            "request_type",
+            ENUM("invitation", "join_request", "member", name="request_type"),
+            nullable=False
+        ),
         sa.Column(
             "company_id",
             UUID(as_uuid=True),
@@ -50,4 +48,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("invitation")
-    _get_request_type().drop(op.get_bind())
+    op.execute("DROP TYPE request_type")
