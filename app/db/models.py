@@ -3,7 +3,7 @@ import uuid
 from enum import Enum
 
 from pydantic import ValidationError
-from sqlalchemy import String, UUID, Boolean, ForeignKey, JSON
+from sqlalchemy import String, UUID, Boolean, ForeignKey, JSON, Integer
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, Relationship, validates
 from sqlalchemy.ext.mutable import MutableList
@@ -71,6 +71,7 @@ class Quiz(IDBase):
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(500))
+    num_done: Mapped[int] = mapped_column(Integer(), default=0)
     company_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("company.id", ondelete="CASCADE"), nullable=False
     )

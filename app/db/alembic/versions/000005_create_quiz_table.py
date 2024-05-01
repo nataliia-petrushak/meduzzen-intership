@@ -27,6 +27,7 @@ def upgrade() -> None:
         sa.Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
         sa.Column("name", sa.String(100), nullable=False),
         sa.Column("description", sa.String(500)),
+        sa.Column("num_done", sa.Integer(), default=0),
         sa.Column(
             "company_id",
             UUID(as_uuid=True),
