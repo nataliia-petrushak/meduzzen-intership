@@ -14,7 +14,6 @@ async def test_user_create_join_request(
     user_id: UUID,
     company_id: UUID,
     prepare_database,
-    fill_database_with_companies,
 ) -> None:
     response = client.post(
         f"user/{user_id}/join-requests/{company_id}",
@@ -32,7 +31,6 @@ async def test_unauthorized_user_create_request_forbidden(
     user_id: UUID,
     company_id: UUID,
     prepare_database,
-    fill_database_with_companies,
 ) -> None:
     response = client.post(
         f"user/{user_id}/join-requests/{company_id}",
@@ -48,7 +46,6 @@ async def test_user_cancel_join_request(
     request_id: UUID,
     user_id: UUID,
     prepare_database,
-    fill_db_with_join_requests,
 ) -> None:
     response = client.delete(
         f"user/{user_id}/join-requests/{request_id}",
@@ -64,7 +61,6 @@ async def test_unauthorized_user_cancel_request_forbidden(
     request_id: UUID,
     user_id: UUID,
     prepare_database,
-    fill_db_with_join_requests,
 ) -> None:
     response = client.delete(f"user/{user_id}/join-requests/{request_id}")
 
@@ -78,7 +74,6 @@ async def test_user_accept_invitation(
     invitation_id: UUID,
     token: str,
     prepare_database,
-    fill_db_with_invitations,
 ) -> None:
     response = client.patch(
         f"user/{user_id}/invitations/{invitation_id}",
@@ -99,7 +94,6 @@ async def test_user_decline_invitation(
     invitation_id: UUID,
     token: str,
     prepare_database,
-    fill_db_with_invitations,
 ) -> None:
     response = client.delete(
         f"user/{user_id}/invitations/{invitation_id}",
@@ -147,14 +141,13 @@ async def test_user_get_request_list(
 @pytest.mark.asyncio
 async def test_user_leave_company(
     client: TestClient,
-    user_id: UUID,
+    member_id: UUID,
     company_id: UUID,
     token: str,
     prepare_database,
-    fill_db_with_members,
 ) -> None:
     response = client.delete(
-        f"user/{user_id}/leave/{company_id}",
+        f"user/{member_id}/leave/{company_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
 
