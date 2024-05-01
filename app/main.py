@@ -62,7 +62,7 @@ async def owner_inviting_error_handler(request: Request, exc: OwnerRequestError)
 @app.exception_handler(AssignError)
 async def assign_inviting_error_handler(request: Request, exc: AssignError):
     return JSONResponse(
-        status_code=status.HTTP_405_METHOD_NOT_ALLOWED, content={"message": exc.msg}
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": exc.msg}
     )
 
 
