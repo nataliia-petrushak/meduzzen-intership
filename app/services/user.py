@@ -15,14 +15,14 @@ class UserService:
 
     async def create_model(self, db: AsyncSession, model_data: UserSignUp) -> User:
         try:
-            user = await self._user_repo.get_user_by_email(
-                db=db, email=model_data.email
+            user = await self._user_repo.get_model_by(
+                db=db, filters={"email": model_data.email}
             )
             user.is_active = True
             await db.commit()
         except ObjectNotFound:
             model_data.password = SecurityService.hash_password(model_data.password)
-            model_data = model_data.model_dump(exclude_unset=True)
+            model_data = model_data.model_dump()
             user = await self._user_repo.create_model(db=db, model_data=model_data)
         return user
 
@@ -46,7 +46,7 @@ class UserService:
         )
 
     async def get_model_by_id(self, db: AsyncSession, model_id: UUID) -> User:
-        return await self._user_repo.get_model_by_id(db, model_id=model_id)
+        return await self._user_repo.get_model_by(db=db, filters={"id": model_id})
 
     async def user_deactivate(
         self, db: AsyncSession, user_id: UUID, user: GetUser
@@ -57,4 +57,4 @@ class UserService:
         )
 
     async def get_user_by_email(self, db: AsyncSession, email: str) -> User:
-        return await self._user_repo.get_user_by_email(db=db, email=email)
+        return await self._user_repo.get_model_by(db=db, filters={"email": email})

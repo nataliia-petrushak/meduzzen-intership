@@ -22,14 +22,14 @@ class BaseRepository:
         models = await db.execute(query)
         return [model[0] for model in models.fetchall()]
 
-    async def get_model_by_id(self, db: AsyncSession, model_id: UUID) -> Base:
+    async def get_model_by(self, db: AsyncSession, filters: dict) -> Base:
         result = await db.execute(
-            select(self.model, self.model.id).filter(self.model.id == model_id)
+            select(self.model, self.model.id).filter_by(**filters)
         )
         model = result.scalar()
-
+        identifier = list(filters.values())[0]
         if not model:
-            raise ObjectNotFound(identifier=model_id, model_name=self.model.__name__)
+            raise ObjectNotFound(identifier=identifier, model_name=self.model.__name__)
 
         return model
 
