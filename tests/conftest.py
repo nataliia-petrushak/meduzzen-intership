@@ -8,12 +8,12 @@ from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
 from app.db.database import Base
-from app.db.models import User, Company, Request
+from app.db.models import User, Company, Request, Quiz
 from app.main import app
 from app.db.database import get_db
 from app.config import settings
 from app.services.security import SecurityService
-from tests.constants import user_payload, company_payload
+from tests.constants import user_payload, company_payload, quiz_payload
 
 async_engine = create_async_engine(settings.test_postgres_url, poolclass=NullPool)
 AsyncSessionLocal = sessionmaker(
@@ -64,7 +64,7 @@ async def fill_database_with_companies(owner_id: UUID):
     async with async_engine.begin() as conn:
         for company in company_payload:
             company["owner_id"] = owner_id
-            await conn.execute(insert(Company).values(company))
+        await conn.execute(insert(Company).values(company_payload))
         await conn.commit()
 
 
@@ -100,7 +100,7 @@ async def invitation_id(db: AsyncSession, fill_db_with_invitations, company_id) 
 
 
 @pytest.fixture(scope="function")
-async def fill_db_with_join_requests(company_id, fill_database_with_companies):
+async def fill_db_with_join_requests(company_id):
     async with async_engine.begin() as conn:
         users = await conn.execute(select(User))
         for user in users:
@@ -123,7 +123,7 @@ async def request_id(db: AsyncSession, fill_db_with_join_requests, user_id) -> U
 
 
 @pytest.fixture(scope="function")
-async def fill_db_with_members(company_id, fill_database_with_companies):
+async def fill_db_with_members(company_id):
     async with async_engine.begin() as conn:
         users = await conn.execute(select(User))
         for user in users:
@@ -150,7 +150,7 @@ async def member_id(db: AsyncSession, fill_db_with_members, user_id) -> UUID:
 
 
 @pytest.fixture(scope="function")
-async def fill_db_with_admins(company_id, fill_database_with_companies):
+async def fill_db_with_admins(company_id):
     async with async_engine.begin() as conn:
         users = await conn.execute(select(User))
         for user in users:
@@ -164,6 +164,21 @@ async def fill_db_with_admins(company_id, fill_database_with_companies):
                 )
             )
         await conn.commit()
+
+
+@pytest.fixture(scope="function")
+async def fill_db_with_quizzes(company_id):
+    async with async_engine.begin() as conn:
+        for quiz in quiz_payload:
+            quiz["company_id"] = company_id
+        await conn.execute(insert(Quiz).values(quiz_payload))
+        await conn.commit()
+
+
+@pytest.fixture(scope="function")
+async def quiz_id(db: AsyncSession, fill_db_with_quizzes, company_id) -> UUID:
+    quizzes = await db.execute(select(Quiz.id).filter(Quiz.company_id == company_id))
+    return quizzes.scalars().fetchall()[0]
 
 
 @pytest.fixture
