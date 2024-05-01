@@ -2,9 +2,10 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import OwnerRequestError
+from app.core.exceptions import OwnerRequestError, AssignError
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.request_repo import RequestRepository
+from app.db.models import RequestType
 from app.dependencies import check_permissions
 from app.schemas.request import GetRequest
 from app.schemas.users import GetUser
@@ -103,3 +104,38 @@ class CompanyRequestService:
         )
         await db.delete(invitation)
         await db.commit()
+
+    async def company_change_member_role(
+            self,
+            db: AsyncSession,
+            company_id: UUID,
+            user_id: UUID,
+            user: GetUser,
+            request_type: RequestType,
+    ) -> GetRequest:
+        company = await self._company_repo.get_model_by(
+            db=db, filters={"id": company_id}
+        )
+        check_permissions(user_id=company.owner_id, user=user)
+        request = await self._request_repo.get_model_by(
+            db=db, filters={"user_id": user_id, "company_id": company_id}
+        )
+        if request.request_type in [RequestType.join_request, RequestType.invitation]:
+            raise AssignError(identifier=request.user_id)
+        if request_type in [RequestType.invitation, RequestType.join_request]:
+            raise AssignError(identifier=user_id)
+
+        return await self._request_repo.update_model(
+            db=db, model_id=request.id, model_data={"request_type": request_type}
+        )
+
+    async def company_admin_list(
+            self,
+            db: AsyncSession,
+            company_id: UUID,
+            offset: int = 0,
+            limit: int = 10,
+    ) -> list[GetUser]:
+        return await self._request_repo.request_list(
+            db=db, company_id=company_id, request_type="admin", offset=offset, limit=limit
+        )

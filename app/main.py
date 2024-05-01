@@ -11,7 +11,7 @@ from app.core.exceptions import (
     AuthorizationError,
     AccessDeniedError,
     NameExistError,
-    OwnerRequestError,
+    OwnerRequestError, AssignError,
 )
 
 app = FastAPI()
@@ -54,6 +54,13 @@ async def access_denied_error_handler(request: Request, exc: AccessDeniedError):
 
 @app.exception_handler(OwnerRequestError)
 async def owner_inviting_error_handler(request: Request, exc: OwnerRequestError):
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": exc.msg}
+    )
+
+
+@app.exception_handler(AssignError)
+async def assign_inviting_error_handler(request: Request, exc: AssignError):
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": exc.msg}
     )
