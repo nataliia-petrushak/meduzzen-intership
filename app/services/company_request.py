@@ -111,7 +111,7 @@ class CompanyRequestService:
             company_id: UUID,
             user_id: UUID,
             user: GetUser,
-            request_type: str = "admin"
+            request_type: RequestType,
     ) -> GetRequest:
         company = await self._company_repo.get_model_by(
             db=db, filters={"id": company_id}
@@ -122,6 +122,9 @@ class CompanyRequestService:
         )
         if request.request_type in [RequestType.join_request, RequestType.invitation]:
             raise AssignError(identifier=request.user_id)
+        if request_type in [RequestType.invitation, RequestType.join_request]:
+            raise AssignError(identifier=user_id)
+
         return await self._request_repo.update_model(
             db=db, model_id=request.id, model_data={"request_type": request_type}
         )
