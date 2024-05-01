@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.db.database import get_db
+from app.db.models import RequestType
 from app.schemas.request import GetRequest
 from app.schemas.users import GetUser
 from app.services.auth import get_authenticated_user
@@ -157,30 +158,16 @@ async def company_delete_member(
 @router.patch(
     "/{company_id}/members/{user_id}", status_code=status.HTTP_200_OK
 )
-async def company_assign_member_as_admin(
+async def company_change_member_role(
         company_id: UUID,
         user_id: UUID,
+        request_type: RequestType,
         user: GetUser = Depends(get_authenticated_user),
         db: AsyncSession = Depends(get_db),
         request_service: CompanyRequestService = Depends(CompanyRequestService)
 ) -> GetRequest:
     return await request_service.company_change_member_role(
-        db=db, company_id=company_id, user_id=user_id, user=user
-    )
-
-
-@router.patch(
-    "/{company_id}/admins/{user_id}", status_code=status.HTTP_200_OK
-)
-async def company_assign_admin_as_member(
-        company_id: UUID,
-        user_id: UUID,
-        user: GetUser = Depends(get_authenticated_user),
-        db: AsyncSession = Depends(get_db),
-        request_service: CompanyRequestService = Depends(CompanyRequestService)
-) -> GetRequest:
-    return await request_service.company_change_member_role(
-        db=db, company_id=company_id, user_id=user_id, user=user, request_type="member"
+        db=db, company_id=company_id, user_id=user_id, user=user, request_type=request_type
     )
 
 
