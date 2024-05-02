@@ -18,25 +18,20 @@ class QuizService:
         self._company_repo = CompanyRepository()
         self._request_repo = RequestRepository()
 
-    async def check_user(
+    async def check_user_is_admin_or_owner(
         self, db: AsyncSession, company_id: UUID, user: GetUser
     ) -> None:
-        try:
-            request = await self._request_repo.get_model_by(
-                db=db, filters={"user_id": user.id, "company_id": company_id}
-            )
-            if request.request_type != RequestType.admin:
-                raise AccessDeniedError()
-        except ObjectNotFound:
-            company = await self._company_repo.get_model_by(
-                db=db, filters={"id": company_id}
-            )
-            check_permissions(user_id=company.owner_id, user=user)
+        company_admins = await self._request_repo.request_list(
+            db=db, company_id=company_id, request_type="admin"
+        )
+        company = await self._company_repo.get_model_by(db=db, filters={"id": company_id})
+        if user not in company_admins and company.owner_id != user.id:
+            raise AccessDeniedError()
 
     async def create_quiz(
         self, company_id: UUID, quiz_data: QuizCreate, user: GetUser, db: AsyncSession
     ) -> GetQuiz:
-        await self.check_user(db=db, company_id=company_id, user=user)
+        await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
         model_data = quiz_data.model_dump()
         model_data["company_id"] = company_id
 
@@ -50,7 +45,7 @@ class QuizService:
         user: GetUser,
         db: AsyncSession,
     ) -> GetQuiz:
-        await self.check_user(db=db, company_id=company_id, user=user)
+        await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
 
         model_data = quiz_data.model_dump(exclude_unset=True)
         return await self._quiz_repo.update_model(
@@ -65,7 +60,7 @@ class QuizService:
         offset: int = 0,
         limit: int = 10,
     ) -> list[GetQuiz]:
-        await self.check_user(db=db, company_id=company_id, user=user)
+        await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
         return await self._quiz_repo.get_model_list(
             db=db, offset=offset, limit=limit, filters={"company_id": company_id}
         )
@@ -73,5 +68,5 @@ class QuizService:
     async def delete_quiz(
         self, company_id: UUID, user: GetUser, db: AsyncSession, quiz_id: UUID
     ) -> None:
-        await self.check_user(db=db, company_id=company_id, user=user)
+        await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
         await self._quiz_repo.delete_model(db=db, model_id=quiz_id)
