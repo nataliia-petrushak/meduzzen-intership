@@ -2,12 +2,12 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import AccessDeniedError, ValidationError, ObjectNotFound
+from app.core.exceptions import AccessDeniedError, ObjectNotFound
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.quiz_repo import QuizRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.db.models import RequestType
-from app.dependencies import check_permissions
+from app.permissions import check_permissions
 from app.schemas.quiz import QuizCreate, GetQuiz, QuizUpdate
 from app.schemas.users import GetUser
 
@@ -33,23 +33,11 @@ class QuizService:
             )
             check_permissions(user_id=company.owner_id, user=user)
 
-    @staticmethod
-    def validate_quiz(quiz: dict) -> dict:
-        if len(quiz["questions"]) < 2:
-            raise ValidationError(detail="Questions should be at least 2")
-
-        for question in quiz["questions"]:
-            if len(question["answers"]) < 2:
-                raise ValidationError(detail="Answers should be at least 2")
-
-        return quiz
-
     async def create_quiz(
         self, company_id: UUID, quiz_data: QuizCreate, user: GetUser, db: AsyncSession
     ) -> GetQuiz:
         await self.check_user(db=db, company_id=company_id, user=user)
-
-        model_data = self.validate_quiz(quiz_data.model_dump())
+        model_data = quiz_data.model_dump()
         model_data["company_id"] = company_id
 
         return await self._quiz_repo.create_model(db=db, model_data=model_data)
@@ -65,8 +53,6 @@ class QuizService:
         await self.check_user(db=db, company_id=company_id, user=user)
 
         model_data = quiz_data.model_dump(exclude_unset=True)
-        if model_data["questions"]:
-            model_data = self.validate_quiz(model_data)
         return await self._quiz_repo.update_model(
             db=db, model_data=model_data, model_id=quiz_id
         )
