@@ -105,20 +105,31 @@ company_data = {"name": "Test", "description": "", "is_hidden": False}
 quiz_data = {
     "name": "Test",
     "description": "",
-    "questions": [{"answers": ["", ""]}, {"answers": ["", ""]}, {"answers": ["", ""]}],
+    "questions": [
+        {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]},
+        {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]},
+        {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]}],
 }
 quiz_update_data = {
     "name": "Test1",
     "description": "1",
-    "questions": [{"answers": ["", ""]}, {"answers": ["", ""]}, {"answers": ["", ""]}],
+    "questions": [
+        {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]},
+        {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]},
+        {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]}
+    ],
 }
 quiz_data_1_question = {
     "name": "Test",
     "description": "",
-    "questions": [{"answers": ["", ""]}],
+    "questions": [{"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]}],
 }
 quiz_data_1_answer = {
     "name": "Test",
     "description": "",
-    "questions": [{"answers": [""]}, {"answers": ["", ""]}, {"answers": ["", ""]}],
+    "questions": [
+        {"question": "1", "variants": ["1"], "answers": ["1"]},
+        {"question": "1", "variants": ["1"], "answers": ["1"]},
+        {"question": "1", "variants": ["1"], "answers": ["1"]}
+    ],
 }
