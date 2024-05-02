@@ -10,11 +10,11 @@ from app.schemas.users import GetUser
 from app.services.auth import get_authenticated_user
 from app.services.quiz import QuizService
 
-router = APIRouter(tags=["quiz"], prefix="/company")
+router = APIRouter(tags=["quiz"], prefix="/company/{company_id}/quiz")
 
 
 @router.post(
-    "/{company_id}/quiz", response_model=GetQuiz, status_code=status.HTTP_201_CREATED
+    "/", response_model=GetQuiz, status_code=status.HTTP_201_CREATED
 )
 async def create_quiz(
     company_id: UUID,
@@ -23,23 +23,13 @@ async def create_quiz(
     quiz_service: QuizService = Depends(QuizService),
     db: AsyncSession = Depends(get_db),
 ) -> GetQuiz:
-    """The structure of the questions field:
-    [
-        {
-            "question": "What is the....",
-            "variants": ["first", "second", "third"],
-            "answer": ["answer", "answer"]
-        },
-        ...
-    ]
-    """
     return await quiz_service.create_quiz(
         db=db, company_id=company_id, quiz_data=quiz_data, user=user
     )
 
 
 @router.get(
-    "/{company_id}/quiz", response_model=list[GetQuiz], status_code=status.HTTP_200_OK
+    "/", response_model=list[GetQuiz], status_code=status.HTTP_200_OK
 )
 async def get_quiz_list(
     company_id: UUID,
@@ -55,7 +45,7 @@ async def get_quiz_list(
 
 
 @router.patch(
-    "/{company_id}/quiz/{quiz_id}",
+    "/{quiz_id}",
     response_model=GetQuiz,
     status_code=status.HTTP_200_OK,
 )
@@ -72,7 +62,7 @@ async def update_quiz(
     )
 
 
-@router.delete("/{company_id}/quiz/{quiz_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{quiz_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_quiz(
     company_id: UUID,
     quiz_id: UUID,
