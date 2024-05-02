@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ObjectNotFound
 from app.db.models import User
-from app.dependencies import check_permissions
+from app.permissions import check_permissions
 from app.schemas.users import UserSignUp, UserUpdate, GetUser
 from app.services.security import SecurityService
 from app.db.alembic.repos.user_repo import UserRepository

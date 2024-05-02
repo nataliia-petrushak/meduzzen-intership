@@ -6,7 +6,7 @@ from app.core.exceptions import OwnerRequestError, AssignError
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.db.models import RequestType
-from app.dependencies import check_permissions
+from app.permissions import check_permissions
 from app.schemas.request import GetRequest
 from app.schemas.users import GetUser
 
