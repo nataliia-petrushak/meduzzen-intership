@@ -1,11 +1,9 @@
-import json
 import uuid
 from enum import Enum
 
-from pydantic import ValidationError
 from sqlalchemy import String, UUID, Boolean, ForeignKey, JSON, Integer
-from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.orm import Mapped, mapped_column, Relationship, validates
+from sqlalchemy.dialects.postgresql import ENUM, JSONB
+from sqlalchemy.orm import Mapped, mapped_column, Relationship
 from sqlalchemy.ext.mutable import MutableList
 
 from app.db.database import Base
@@ -76,7 +74,7 @@ class Quiz(IDBase):
         UUID(as_uuid=True), ForeignKey("company.id", ondelete="CASCADE"), nullable=False
     )
     questions: Mapped[JSON] = mapped_column(
-        MutableList.as_mutable(JSON()), nullable=False
+        MutableList.as_mutable(JSONB()), nullable=False
     )
 
     company: Mapped[Company] = Relationship("Company", lazy="selectin")

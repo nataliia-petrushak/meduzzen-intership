@@ -11,7 +11,8 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy import UUID, JSON
+from sqlalchemy import UUID
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.mutable import MutableDict
 
 # revision identifiers, used by Alembic.
@@ -34,7 +35,7 @@ def upgrade() -> None:
             sa.ForeignKey("company.id", ondelete="CASCADE"),
             nullable=False,
         ),
-        sa.Column("questions", MutableDict.as_mutable(JSON()), nullable=False),
+        sa.Column("questions", MutableDict.as_mutable(JSONB()), nullable=False),
         sa.ForeignKeyConstraint(["company_id"], ["company.id"]),
     )
 
