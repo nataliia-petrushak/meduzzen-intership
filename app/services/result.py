@@ -72,6 +72,7 @@ class ResultService:
             return await self.update_result(
                 db=db, result=previous_result, num_corr_answers=num_corr_answers, quiz=quiz
             )
+
         return await self._result_repo.create_model(
             db=db,
             model_data={
@@ -94,6 +95,11 @@ class ResultService:
     ) -> GetResult:
         quiz = await self._quiz_repo.get_model_by(db=db, filters={"id": quiz_id})
         await self.check_user_is_member(db=db, user=user, company_id=quiz.company_id)
+
+        await self._quiz_repo.update_model(
+            db=db, model_id=quiz.id, model_data={"num_done": quiz.num_done + 1}
+        )
+
         num_corr_answers = self.num_correct_answers(quiz=quiz, answers=answers)
         return await self.create_or_update_result(
             quiz=quiz, user=user, db=db, num_corr_answers=num_corr_answers
