@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
 from app.db.database import Base
-from app.db.models import User, Company, Request, Quiz
+from app.db.models import User, Company, Request, Quiz, Result
 from app.main import app
 from app.db.database import get_db
 from app.config import settings
@@ -179,6 +179,28 @@ async def fill_db_with_quizzes(company_id):
 async def quiz_id(db: AsyncSession, fill_db_with_quizzes, company_id) -> UUID:
     quizzes = await db.execute(select(Quiz.id).filter(Quiz.company_id == company_id))
     return quizzes.scalars().fetchall()[0]
+
+
+@pytest.fixture(scope="function")
+async def fill_db_with_results(fill_db_with_quizzes, user_id) -> None:
+    async with async_engine.begin() as conn:
+        quizzes = await conn.execute(select(Quiz))
+        for quiz in quizzes:
+            await conn.execute(insert(Result).values([
+                {
+                    "user_id": user_id,
+                    "company_id": quiz.company_id,
+                    "quiz_id": quiz.id,
+                    "all_results": [{"num_corr_answers": 1, "questions_count": 3}]
+                },
+                {
+                    "user_id": user_id,
+                    "company_id": quiz.company_id,
+                    "quiz_id": quiz.id,
+                    "all_results": [{"num_corr_answers": 2, "questions_count": 5}]
+                }
+            ]))
+        await conn.commit()
 
 
 @pytest.fixture
