@@ -9,6 +9,7 @@ from app.core.exceptions import ValidationError
 class Answers(BaseModel):
     question: str
     answers: list
+    is_correct: bool = False
 
     @field_validator("answers")
     def validate_answers(cls, answers: list) -> list:
