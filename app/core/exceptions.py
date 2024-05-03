@@ -38,3 +38,9 @@ class AssignError(Exception):
     def __init__(self, identifier: Any) -> None:
         self.msg = f"You can`t assign user with {identifier} for this position"
         super().__init__(self.msg)
+
+
+class ValidationError(Exception):
+    def __init__(self, detail: str) -> None:
+        self.msg = detail
+        super().__init__(self.msg)

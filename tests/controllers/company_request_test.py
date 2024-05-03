@@ -14,7 +14,6 @@ async def test_owner_create_company_invitation(
     company_id: UUID,
     owner_token: str,
     prepare_database,
-    fill_database_with_companies,
 ) -> None:
     response = client.post(
         f"company/{company_id}/invitation/{user_id}",
@@ -34,7 +33,6 @@ async def test_owners_invite_themself_forbidden(
     company_id: UUID,
     owner_token: str,
     prepare_database,
-    fill_database_with_companies,
 ) -> None:
     response = client.post(
         f"company/{company_id}/invitation/{owner_id}",
@@ -50,7 +48,6 @@ async def test_user_create_company_invitation_forbidden(
     company_id: UUID,
     token: str,
     prepare_database,
-    fill_database_with_companies,
 ) -> None:
     response = client.post(
         f"company/{company_id}/invitation/{user_id}",
@@ -67,7 +64,6 @@ async def test_owner_cancel_company_invitation(
     company_id: UUID,
     owner_token: str,
     prepare_database,
-    fill_database_with_companies,
 ) -> None:
     response = client.delete(
         f"company/{company_id}/invitation/{invitation_id}",
@@ -84,7 +80,6 @@ async def test_user_cancel_company_invitation_forbidden(
     company_id: UUID,
     token: str,
     prepare_database,
-    fill_database_with_companies,
 ) -> None:
     print(invitation_id)
     response = client.delete(
@@ -102,7 +97,6 @@ async def test_owner_accept_join_request(
     request_id: UUID,
     owner_token: str,
     prepare_database,
-    fill_db_with_join_requests,
 ) -> None:
     response = client.patch(
         f"company/{company_id}/join-request/{request_id}",
@@ -123,7 +117,6 @@ async def test_user_accept_join_request_forbidden(
     request_id: UUID,
     token: str,
     prepare_database,
-    fill_db_with_join_requests,
 ) -> None:
     response = client.patch(
         f"company/{company_id}/join-request/{request_id}",
@@ -140,7 +133,6 @@ async def test_owner_decline_join_request(
     request_id: UUID,
     owner_token: str,
     prepare_database,
-    fill_db_with_join_requests,
 ) -> None:
     response = client.delete(
         f"company/{company_id}/join-request/{request_id}",
@@ -157,7 +149,6 @@ async def test_user_decline_join_request_forbidden(
     request_id: UUID,
     token: str,
     prepare_database,
-    fill_db_with_join_requests,
 ) -> None:
     response = client.delete(
         f"company/{company_id}/join-request/{request_id}",
@@ -178,24 +169,6 @@ async def test_get_company_member_list(
     assert result[1]["username"] == user_payload[1]["username"]
     assert result[2]["username"] == user_payload[2]["username"]
     assert result[3]["username"] == user_payload[3]["username"]
-
-
-@pytest.mark.asyncio
-async def test_owner_get_company_member_list(
-    client: TestClient,
-    company_id: UUID,
-    owner_token: str,
-    prepare_database,
-    fill_db_with_invitations,
-) -> None:
-    response = client.get(
-        f"company/{company_id}/invitations",
-        headers={"Authorization": f"Bearer {owner_token}"},
-    )
-    result = response.json()
-
-    assert response.status_code == status.HTTP_200_OK
-    assert result[0]["username"] == user_payload[1]["username"]
 
 
 @pytest.mark.asyncio
@@ -274,7 +247,6 @@ async def test_owner_delete_member(
     member_id: UUID,
     owner_token: str,
     prepare_database,
-    fill_db_with_members,
 ) -> None:
     response = client.delete(
         f"company/{company_id}/members/{member_id}",
@@ -291,7 +263,6 @@ async def test_user_delete_member_forbidden(
     member_id: UUID,
     token: str,
     prepare_database,
-    fill_db_with_members,
 ) -> None:
     response = client.delete(
         f"company/{company_id}/members/{member_id}",
@@ -303,17 +274,16 @@ async def test_user_delete_member_forbidden(
 
 @pytest.mark.asyncio
 async def test_owner_assign_admin(
-        client: TestClient,
-        company_id: UUID,
-        user_id: UUID,
-        owner_token: str,
-        prepare_database,
-        fill_db_with_members,
+    client: TestClient,
+    company_id: UUID,
+    member_id: UUID,
+    owner_token: str,
+    prepare_database,
 ) -> None:
     response = client.patch(
-        f"company/{company_id}/members/{user_id}",
+        f"company/{company_id}/members/{member_id}",
         headers={"Authorization": f"Bearer {owner_token}"},
-        params={"request_type": "admin"}
+        params={"request_type": "admin"},
     )
     assert response.status_code == status.HTTP_200_OK
     assert response.json().get("request_type") == "admin"
@@ -321,17 +291,17 @@ async def test_owner_assign_admin(
 
 @pytest.mark.asyncio
 async def test_owner_assign_admin_as_member(
-        client: TestClient,
-        company_id: UUID,
-        user_id: UUID,
-        owner_token: str,
-        prepare_database,
-        fill_db_with_admins,
+    client: TestClient,
+    company_id: UUID,
+    user_id: UUID,
+    owner_token: str,
+    prepare_database,
+    fill_db_with_admins,
 ) -> None:
     response = client.patch(
         f"company/{company_id}/members/{user_id}",
         headers={"Authorization": f"Bearer {owner_token}"},
-        params={"request_type": "member"}
+        params={"request_type": "member"},
     )
     assert response.status_code == status.HTTP_200_OK
     assert response.json().get("request_type") == "member"
@@ -339,61 +309,57 @@ async def test_owner_assign_admin_as_member(
 
 @pytest.mark.asyncio
 async def test_owner_assign_not_member_as_admin_forbidden(
-        client: TestClient,
-        company_id: UUID,
-        user_id: UUID,
-        owner_token: str,
-        prepare_database,
-        fill_db_with_invitations,
+    client: TestClient,
+    company_id: UUID,
+    user_id: UUID,
+    owner_token: str,
+    prepare_database,
+    fill_db_with_invitations,
 ) -> None:
     response = client.patch(
         f"company/{company_id}/members/{user_id}",
         headers={"Authorization": f"Bearer {owner_token}"},
-        params={"request_type": "admin"}
+        params={"request_type": "admin"},
     )
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 @pytest.mark.asyncio
 async def test_user_assign_member_as_admin_forbidden(
-        client: TestClient,
-        company_id: UUID,
-        user_id: UUID,
-        token: str,
-        prepare_database,
-        fill_db_with_invitations,
+    client: TestClient,
+    company_id: UUID,
+    user_id: UUID,
+    token: str,
+    prepare_database,
+    fill_db_with_invitations,
 ) -> None:
     response = client.patch(
         f"company/{company_id}/members/{user_id}",
         headers={"Authorization": f"Bearer {token}"},
-        params={"request_type": "admin"}
+        params={"request_type": "admin"},
     )
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 @pytest.mark.asyncio
 async def test_owner_assign_member_other_roles_forbidden(
-        client: TestClient,
-        company_id: UUID,
-        user_id: UUID,
-        token: str,
-        prepare_database,
-        fill_db_with_invitations,
+    client: TestClient,
+    company_id: UUID,
+    member_id: UUID,
+    token: str,
+    prepare_database,
 ) -> None:
     response = client.patch(
-        f"company/{company_id}/members/{user_id}",
+        f"company/{company_id}/members/{member_id}",
         headers={"Authorization": f"Bearer {token}"},
-        params={"request_type": "invitation"}
+        params={"request_type": "invitation"},
     )
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 @pytest.mark.asyncio
 async def test_company_admin_list(
-        client: TestClient,
-        company_id: UUID,
-        prepare_database,
-        fill_db_with_admins
+    client: TestClient, company_id: UUID, prepare_database, fill_db_with_admins
 ) -> None:
     response = client.get(f"company/{company_id}/admins")
 

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import OwnerRequestError
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.request_repo import RequestRepository
-from app.dependencies import check_permissions
+from app.permissions import check_permissions
 from app.schemas.company import GetCompany
 from app.schemas.request import GetRequest
 from app.schemas.users import GetUser

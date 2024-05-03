@@ -4,14 +4,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
 from starlette.responses import JSONResponse
 
-from app.routers import health, user, auth, company, user_request, company_request
+from app.routers import health, user, auth, company, user_request, company_request, quiz
 from app.config import settings
 from app.core.exceptions import (
     ObjectNotFound,
     AuthorizationError,
     AccessDeniedError,
     NameExistError,
-    OwnerRequestError, AssignError,
+    OwnerRequestError,
+    AssignError,
+    ValidationError,
 )
 
 app = FastAPI()
@@ -22,6 +24,7 @@ app.include_router(auth.router)
 app.include_router(company.router)
 app.include_router(company_request.router)
 app.include_router(user_request.router)
+app.include_router(quiz.router)
 
 
 @app.exception_handler(ObjectNotFound)
@@ -63,6 +66,13 @@ async def owner_inviting_error_handler(request: Request, exc: OwnerRequestError)
 async def assign_inviting_error_handler(request: Request, exc: AssignError):
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": exc.msg}
+    )
+
+
+@app.exception_handler(ValidationError)
+async def validation_error_handler(request: Request, exc: ValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content={"message": exc.msg}
     )
 
 

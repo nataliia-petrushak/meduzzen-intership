@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import NameExistError, ObjectNotFound
 from app.db.alembic.repos.company_repo import CompanyRepository
-from app.dependencies import check_permissions
+from app.permissions import check_permissions
 from app.schemas.company import CompanyCreate, CompanyUpdate, GetCompany, CompanyDetail
 from app.schemas.users import GetUser
 
