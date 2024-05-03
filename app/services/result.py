@@ -1,11 +1,14 @@
+import pickle
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import AccessDeniedError, ObjectNotFound
+from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.quiz_repo import QuizRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.db.alembic.repos.result_repo import ResultRepository
+from app.db.redis import DBRedisManager
 from app.permissions import check_permissions
 from app.schemas.quiz import GetQuiz
 from app.schemas.result import Answers, GetResult, Rating
@@ -17,6 +20,8 @@ class ResultService:
         self._result_repo = ResultRepository()
         self._request_repo = RequestRepository()
         self._quiz_repo = QuizRepository()
+        self._company_repo = CompanyRepository()
+        self._redis = DBRedisManager()
 
     async def check_user_is_member(self, user: GetUser, company_id: UUID, db: AsyncSession) -> None:
         company_members = await self._request_repo.request_list(
@@ -43,6 +48,7 @@ class ResultService:
             if answer.question == question["question"]:
                 if sorted(answer.answers) == sorted(question["answers"]):
                     score = 1
+                    answer.is_correct = True
         return score
 
     def num_correct_answers(self, quiz: GetQuiz, answers: list[Answers]) -> int:
@@ -91,19 +97,23 @@ class ResultService:
             db: AsyncSession,
             quiz_id: UUID,
             user: GetUser,
-            answers: list[Answers]
+            answers: list[Answers],
     ) -> GetResult:
         quiz = await self._quiz_repo.get_model_by(db=db, filters={"id": quiz_id})
+        company = await self._company_repo.get_model_by(db=db, filters={"id": quiz.company_id})
+        num_corr_answers = self.num_correct_answers(quiz=quiz, answers=answers)
         await self.check_user_is_member(db=db, user=user, company_id=quiz.company_id)
 
         await self._quiz_repo.update_model(
             db=db, model_id=quiz.id, model_data={"num_done": quiz.num_done + 1}
         )
 
-        num_corr_answers = self.num_correct_answers(quiz=quiz, answers=answers)
-        return await self.create_or_update_result(
+        redis_data = {"user": user, "company": company, "quiz": quiz, "answers": answers}
+        result = await self.create_or_update_result(
             quiz=quiz, user=user, db=db, num_corr_answers=num_corr_answers
         )
+        await self._redis.set_value(f"result_{result.id}", pickle.dumps(redis_data))
+        return result
 
     async def count_rating_for_user(
             self, db: AsyncSession, user_id: UUID, user: GetUser, company_id: UUID = None
