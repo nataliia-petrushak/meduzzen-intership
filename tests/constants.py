@@ -43,33 +43,37 @@ company_payload = [
 
 quiz_payload = [
     {
-        "name": "test_1",
+        "name": "Test_1",
         "description": "",
         "questions": [
-            {"answers": ["", ""]},
-            {"answers": ["", ""]},
-            {"answers": ["", ""]},
-        ],
+            {"question": "1", "variants": ["1", "2"], "answers": ["1"]},
+            {"question": "2", "variants": ["1", "2"], "answers": ["2"]},
+            {"question": "3", "variants": ["1", "3"], "answers": ["1", "3"]}],
     },
     {
-        "name": "test_1",
+        "name": "Test_1",
         "description": "",
         "questions": [
-            {"answers": ["", ""]},
-            {"answers": ["", ""]},
-            {"answers": ["", ""]},
-        ],
+            {"question": "1", "variants": ["1", "2"], "answers": ["1"]},
+            {"question": "2", "variants": ["1", "2"], "answers": ["2"]},
+            {"question": "3", "variants": ["1", "3"], "answers": ["1", "3"]}],
     },
     {
-        "name": "test_1",
+        "name": "Test_1",
         "description": "",
         "questions": [
-            {"answers": ["", ""]},
-            {"answers": ["", ""]},
-            {"answers": ["", ""]},
-        ],
-    },
+            {"question": "1", "variants": ["1", "2"], "answers": ["1"]},
+            {"question": "2", "variants": ["1", "2"], "answers": ["2"]},
+            {"question": "3", "variants": ["1", "3"], "answers": ["1", "3"]}],
+    }
 ]
+
+answers = [
+    {"question": "1", "answers": ["2"]},
+    {"question": "2", "answers": ["2"]},
+    {"question": "3", "answers": ["3", "1"]}
+]
+
 
 
 user_bad_data = {
