@@ -113,6 +113,8 @@ class QuizResultService:
         all_questions_count = await self._quiz_result_repo.get_user_results_records(
             db=db, param="questions_count", filters=filters
         )
+        if not all_questions_count:
+            return Rating(rating=None)
 
         rating = round(sum(all_num_corr_answers) / sum(all_questions_count), 3)
         return Rating(rating=rating)
