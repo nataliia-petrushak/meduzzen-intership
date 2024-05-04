@@ -69,9 +69,9 @@ quiz_payload = [
 ]
 
 answers = [
-    {"question": "1", "answers": ["2"]},
-    {"question": "2", "answers": ["2"]},
-    {"question": "3", "answers": ["3", "1"]}
+    {"question": "1", "answers": ["2"], "is_correct": False},
+    {"question": "2", "answers": ["2"], "is_correct": True},
+    {"question": "3", "answers": ["3", "1"], "is_correct": True}
 ]
 
 
