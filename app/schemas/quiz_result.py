@@ -1,9 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, field_validator, Field
-
-from app.core.exceptions import ValidationError
+from pydantic import BaseModel, Field
 
 
 class Answers(BaseModel):
@@ -16,18 +14,17 @@ class Answers(BaseModel):
             raise ValidationError(detail="Question must have at least one answer")
         return answers
 
-
-class AllResults(BaseModel):
+class AllQuizResults(BaseModel):
     date: datetime = Field(default_factory=datetime.now)
     num_corr_answers: int
     questions_count: int
 
 
-class ResultBase(BaseModel):
-    all_results: list[AllResults]
+class QuizResultBase(BaseModel):
+    all_results: list[AllQuizResults]
 
 
-class GetResult(ResultBase):
+class GetQuizResult(QuizResultBase):
     id: UUID
     user_id: UUID
     company_id: UUID

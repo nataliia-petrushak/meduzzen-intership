@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
 from app.db.database import Base
-from app.db.models import User, Company, Request, Quiz, Result
+from app.db.models import User, Company, Request, Quiz, QuizResult
 from app.main import app
 from app.db.database import get_db
 from app.config import settings
@@ -186,7 +186,7 @@ async def fill_db_with_results(fill_db_with_quizzes, user_id) -> None:
     async with async_engine.begin() as conn:
         quizzes = await conn.execute(select(Quiz))
         for quiz in quizzes:
-            await conn.execute(insert(Result).values([
+            await conn.execute(insert(QuizResult).values([
                 {
                     "user_id": user_id,
                     "company_id": quiz.company_id,
