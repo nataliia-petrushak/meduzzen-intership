@@ -18,7 +18,7 @@ router = APIRouter(prefix="/result", tags=["result"])
     response_model=GetQuizResult,
     status_code=status.HTTP_200_OK
 )
-async def show_quiz_result(
+async def post_quiz_result(
         quiz_id: UUID,
         answers: list[Answers],
         user: GetUser = Depends(get_authenticated_user),
