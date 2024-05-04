@@ -84,7 +84,7 @@ class QuizResultService:
             db=db, model_id=quiz.id, model_data={"num_done": quiz.num_done + 1}
         )
 
-        num_corr_answers = self.num_correct_answers(quiz=quiz, answers=answers)
+        num_corr_answers = len([answer for answer in answers if answer.is_correct == True])
         return await self.create_or_update_result(
             quiz=quiz, user=user, db=db, num_corr_answers=num_corr_answers
         )
@@ -104,6 +104,8 @@ class QuizResultService:
         all_questions_count = await self._quiz_result_repo.get_user_results_records(
             db=db, param="questions_count", filters=filters
         )
+        if not all_questions_count:
+            return Rating(rating=None)
 
         rating = round(sum(all_num_corr_answers) / sum(all_questions_count), 3)
         return Rating(rating=rating)
