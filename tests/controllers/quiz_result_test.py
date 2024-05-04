@@ -101,3 +101,20 @@ async def test_user_get_total_rating(
 
     assert response.status_code == status.HTTP_200_OK
     assert result["rating"] == round(sum([1, 2, 1, 2, 1, 2]) / sum([3, 5, 3, 5, 3, 5]), 3)
+
+
+@pytest.mark.asyncio
+async def test_user_get_total_rating_without_results(
+        client: TestClient,
+        company_id: UUID,
+        user_id: UUID,
+        token: UUID,
+) -> None:
+    response = client.get(
+        f"result/{user_id}/company/{company_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    result = response.json()
+
+    assert response.status_code == status.HTTP_200_OK
+    assert result["rating"] == None
