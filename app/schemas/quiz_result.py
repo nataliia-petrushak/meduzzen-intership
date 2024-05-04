@@ -7,13 +7,8 @@ from pydantic import BaseModel, Field
 class Answers(BaseModel):
     question: str
     answers: list
-    is_correct: bool = False
+    is_correct: bool
 
-    @field_validator("answers")
-    def validate_answers(cls, answers: list) -> list:
-        if len(answers) == 0:
-            raise ValidationError(detail="Question must have at least one answer")
-        return answers
 
 class AllQuizResults(BaseModel):
     date: datetime = Field(default_factory=datetime.now)
@@ -33,4 +28,4 @@ class GetQuizResult(QuizResultBase):
 
 
 class Rating(BaseModel):
-    rating: float
+    rating: float | None
