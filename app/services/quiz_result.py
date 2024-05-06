@@ -1,17 +1,20 @@
-import pickle
+from typing import TextIO
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.responses import StreamingResponse
+import pandas as pd
 
 from app.core.exceptions import AccessDeniedError, ObjectNotFound
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.quiz_repo import QuizRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.db.alembic.repos.quiz_result_repo import QuizResultRepository
+from app.db.models import RequestType
 from app.db.redis import DBRedisManager
 from app.permissions import check_permissions
 from app.schemas.quiz import GetQuiz
-from app.schemas.quiz_result import Answers, GetQuizResult, Rating
+from app.schemas.quiz_result import Answers, GetQuizResult, Rating, RedisResult
 from app.schemas.users import GetUser
 
 
@@ -24,10 +27,28 @@ class QuizResultService:
         self._redis = DBRedisManager()
 
     async def check_user_is_member(self, user: GetUser, company_id: UUID, db: AsyncSession) -> None:
-        company_members = await self._request_repo.request_list(
-            db=db, company_id=company_id, request_type="member"
-        )
-        if user not in company_members:
+        try:
+            self._request_repo.get_model_by(db=db, filters={
+                    "user_id": user.id,
+                    "company_id": company_id,
+                    "request_type": RequestType.member
+                }
+            )
+        except ObjectNotFound:
+            raise AccessDeniedError()
+
+    async def check_user_is_admin_or_owner(
+            self, db: AsyncSession, company_id: UUID, user: GetUser
+    ) -> None:
+        try:
+            request = await self._request_repo.get_model_by(
+                db=db, filters={"company_id": company_id, "user_id": user.id, "request_type": "admin"}
+            )
+        except ObjectNotFound:
+            request = None
+
+        company = await self._company_repo.get_model_by(db=db, filters={"id": company_id})
+        if not request and company.owner_id != user.id:
             raise AccessDeniedError()
 
     async def check_user_did_quiz_before(
@@ -83,7 +104,6 @@ class QuizResultService:
             answers: list[Answers]
     ) -> GetQuizResult:
         quiz = await self._quiz_repo.get_model_by(db=db, filters={"id": quiz_id})
-        company = await self._company_repo.get_model_by(db=db, filters={"id": quiz.company_id})
         num_corr_answers = len([answer for answer in answers if answer.is_correct])
         await self.check_user_is_member(db=db, user=user, company_id=quiz.company_id)
 
@@ -91,11 +111,11 @@ class QuizResultService:
             db=db, model_id=quiz.id, model_data={"num_done": quiz.num_done + 1}
         )
 
-        redis_data = {"user": user, "company": company, "quiz": quiz, "answers": answers}
+        redis_data = {"user": user, "company": quiz.company, "quiz": quiz, "answers": answers}
         result = await self.create_or_update_result(
             quiz=quiz, user=user, db=db, num_corr_answers=num_corr_answers
         )
-        await self._redis.set_value(f"result_{result.id}", pickle.dumps(redis_data))
+        await self._redis.set_value(f"result_{result.id}", redis_data)
         return result
 
     async def count_rating_for_user(
@@ -107,14 +127,66 @@ class QuizResultService:
         if company_id:
             filters["company_id"] = company_id
 
-        all_num_corr_answers = await self._quiz_result_repo.get_user_results_records(
-            db=db, param="num_corr_answers", filters=filters
+        data = await self._quiz_result_repo.get_user_results_records(
+            db=db, filters=filters
         )
-        all_questions_count = await self._quiz_result_repo.get_user_results_records(
-            db=db, param="questions_count", filters=filters
-        )
+
+        all_num_corr_answers = sum(result["num_corr_answers"] for result in data)
+        all_questions_count = sum(result["questions_count"] for result in data)
         if not all_questions_count:
             return Rating(rating=None)
 
-        rating = round(sum(all_num_corr_answers) / sum(all_questions_count), 3)
+        rating = round(all_num_corr_answers / all_questions_count, 3)
         return Rating(rating=rating)
+
+    async def get_data_from_redis(self, result_list: list[GetQuizResult]) -> list[dict]:
+        data = []
+        for result in result_list:
+            redis_res = await self._redis.get_value(f"result_{result.id}")
+            redis_res = redis_res.get("value")
+            if redis_res:
+                redis_res["user"] = redis_res["user"].__dict__
+                redis_res["company"] = redis_res["company"].__dict__
+                redis_res["quiz"] = redis_res["quiz"].__dict__
+                data.append(redis_res)
+        return data
+
+    @staticmethod
+    async def data_to_csv(data: list[dict]) -> StreamingResponse:
+        df = pd.DataFrame(data, columns=["user", "company", "quiz", "answers"])
+        return StreamingResponse(
+            iter(df.to_csv(index=False)),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=data.csv"}
+        )
+
+    async def user_get_cashed_data(
+            self,
+            db: AsyncSession,
+            user: GetUser,
+            user_id: UUID,
+            csv: bool = False,
+    ) -> list[dict] | StreamingResponse:
+        check_permissions(user_id=user_id, user=user)
+        user_results = await self._quiz_result_repo.get_model_list(db=db, filters={"user_id": user_id})
+        data = await self.get_data_from_redis(result_list=user_results)
+        if csv:
+            return await self.data_to_csv(data)
+        return data
+
+    async def company_get_cashed_data(
+            self,
+            db: AsyncSession,
+            user: GetUser,
+            company_id: UUID,
+            csv: bool = False,
+            **kwargs
+    ) -> list[dict] | StreamingResponse:
+        await self.check_user_is_admin_or_owner(company_id=company_id, user=user, db=db)
+        filters = {kwargs[key]: kwargs[value] for key, value in kwargs.items() if kwargs[value] is not None}
+        filters["company_id"] = company_id
+        results = await self._quiz_result_repo.get_model_list(db=db, filters=filters)
+        data = await self.get_data_from_redis(result_list=results)
+        if csv:
+            return await self.data_to_csv(data)
+        return data
