@@ -3,6 +3,10 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.schemas.company import GetCompany
+from app.schemas.quiz import GetQuiz
+from app.schemas.users import GetUser
+
 
 class Answers(BaseModel):
     question: str
@@ -29,3 +33,11 @@ class GetQuizResult(QuizResultBase):
 
 class Rating(BaseModel):
     rating: float | None
+
+
+class RedisResult(BaseModel):
+    user: GetUser
+    company: GetCompany
+    quiz: GetQuiz
+    answers: list[Answers]
+
