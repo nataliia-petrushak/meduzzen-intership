@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
 from starlette.responses import JSONResponse
 
-from app.routers import health, user, auth, company, user_request, company_request, quiz
+from app.routers import health, user, auth, company, user_request, company_request, quiz, quiz_result
 from app.config import settings
 from app.core.exceptions import (
     ObjectNotFound,
@@ -25,6 +25,7 @@ app.include_router(company.router)
 app.include_router(company_request.router)
 app.include_router(user_request.router)
 app.include_router(quiz.router)
+app.include_router(quiz_result.router)
 
 
 @app.exception_handler(ObjectNotFound)

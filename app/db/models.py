@@ -1,7 +1,7 @@
 import uuid
 from enum import Enum
 
-from sqlalchemy import String, UUID, Boolean, ForeignKey, JSON, Integer
+from sqlalchemy import String, UUID, Boolean, ForeignKey, Integer
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 from sqlalchemy.ext.mutable import MutableList
@@ -73,8 +73,27 @@ class Quiz(IDBase):
     company_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("company.id", ondelete="CASCADE"), nullable=False
     )
-    questions: Mapped[JSON] = mapped_column(
+    questions: Mapped[JSONB] = mapped_column(
         MutableList.as_mutable(JSONB()), nullable=False
     )
 
+    company: Mapped[Company] = Relationship("Company", lazy="selectin")
+
+
+class QuizResult(IDBase):
+    __tablename__ = "quiz_result"
+
+    user_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), nullable=False
+    )
+    quiz_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("quiz.id", ondelete="CASCADE"), nullable=True
+    )
+    company_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("company.id", ondelete="CASCADE"), nullable=True
+    )
+    all_results: Mapped[JSONB] = mapped_column(MutableList.as_mutable(JSONB()), nullable=False)
+
+    user: Mapped[User] = Relationship("User", lazy="selectin")
+    quiz: Mapped[Quiz] = Relationship("Quiz", lazy="selectin")
     company: Mapped[Company] = Relationship("Company", lazy="selectin")
