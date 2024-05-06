@@ -80,8 +80,8 @@ class Quiz(IDBase):
     company: Mapped[Company] = Relationship("Company", lazy="selectin")
 
 
-class Result(IDBase):
-    __tablename__ = "result"
+class QuizResult(IDBase):
+    __tablename__ = "quiz_result"
 
     user_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), nullable=False
