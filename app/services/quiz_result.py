@@ -86,6 +86,8 @@ class QuizResultService:
         company = await self._company_repo.get_model_by(db=db, filters={"id": quiz.company_id})
         num_corr_answers = self.num_correct_answers(quiz=quiz, answers=answers)
         await self.check_user_is_member(db=db, user=user, company_id=quiz.company_id)
+        company = await self._company_repo.get_model_by(db=db, filters={"id": quiz.company_id})
+        num_corr_answers = len([answer for answer in answers if answer.is_correct])
 
         await self._quiz_repo.update_model(
             db=db, model_id=quiz.id, model_data={"num_done": quiz.num_done + 1}
