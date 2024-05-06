@@ -21,11 +21,15 @@ class QuizService:
     async def check_user_is_admin_or_owner(
         self, db: AsyncSession, company_id: UUID, user: GetUser
     ) -> None:
-        company_admins = await self._request_repo.request_list(
-            db=db, company_id=company_id, request_type="admin"
-        )
+        try:
+            request = await self._request_repo.get_model_by(
+                db=db, filters={"company_id": company_id, "user_id": user.id, "request_type": "admin"}
+            )
+        except ObjectNotFound:
+            request = None
+
         company = await self._company_repo.get_model_by(db=db, filters={"id": company_id})
-        if user not in company_admins and company.owner_id != user.id:
+        if not request and company.owner_id != user.id:
             raise AccessDeniedError()
 
     async def create_quiz(
