@@ -10,8 +10,8 @@ class QuizResultRepository(BaseRepository):
         super().__init__(QuizResult)
 
     async def get_user_results_records(
-            self, db: AsyncSession, param: str, filters: dict
-    ) -> list[int]:
+            self, db: AsyncSession, filters: dict
+    ) -> list[list]:
         query = select(func.jsonb_array_elements(self.model.all_results)).filter_by(**filters)
         models = await db.execute(query)
-        return [model[0][param] for model in models.fetchall()]
+        return [model[0] for model in models.fetchall()]
