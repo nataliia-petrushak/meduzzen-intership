@@ -84,7 +84,7 @@ class QuizResultService:
             db=db, model_id=quiz.id, model_data={"num_done": quiz.num_done + 1}
         )
 
-        num_corr_answers = len([answer for answer in answers if answer.is_correct == True])
+        num_corr_answers = len([answer for answer in answers if answer.is_correct])
         return await self.create_or_update_result(
             quiz=quiz, user=user, db=db, num_corr_answers=num_corr_answers
         )
