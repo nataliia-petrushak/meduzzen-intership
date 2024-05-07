@@ -13,11 +13,19 @@ class DBRedisManager:
         )
         self._redis_client = Redis(connection_pool=self._pool)
 
-    async def get_value(self, key: Any) -> dict:
+    async def get_value(self, key: Any) -> dict | None:
         if value := await self._redis_client.get(key):
             return {"key": key, "value": pickle.loads(value)}
-        return {"message": "Key not found in Redis"}
+        return None
 
     async def set_value(self, key: Any, value: Any) -> dict:
         await self._redis_client.set(key, pickle.dumps(value), ex=timedelta(hours=48))
         return {"message": f"Value '{value}' written to Redis with key '{key}'"}
+
+    async def get_by_part_of_key(self, key_part: Any) -> list[dict]:
+        result = []
+        async for key in self._redis_client.scan_iter(key_part):
+            value = await self._redis_client.get(key)
+            result.append(pickle.loads(value))
+        return result
+
