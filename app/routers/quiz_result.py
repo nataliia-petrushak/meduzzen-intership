@@ -59,31 +59,27 @@ async def get_user_company_rating(
 @router.get(
     "/{user_id}/cached_results",
     response_model=list[RedisResult] | None,
-    status_code=status.HTTP_200_OK)
+    status_code=status.HTTP_200_OK
+)
 async def get_cached_results(
         user_id: UUID,
-        db: AsyncSession = Depends(get_db),
         user: GetUser = Depends(get_authenticated_user),
         result_service: QuizResultService = Depends(QuizResultService),
         csv: bool = False,
 ) -> list[RedisResult] | StreamingResponse:
-    return await result_service.user_get_cashed_data(user_id=user_id, db=db, user=user, csv=csv)
+    return await result_service.user_get_cashed_data(user_id=user_id, user=user, csv=csv)
 
 
-@router.get(
-    "/{company_id}/cached_results",
-    response_model=list[RedisResult] | None,
-    status_code=status.HTTP_200_OK
-    )
-async def company_get_cached_results(
+@router.get("/{company_id}/cache", response_model=list[RedisResult] | None, status_code=status.HTTP_200_OK)
+async def get_cached_results(
         company_id: UUID,
-        db: AsyncSession = Depends(get_db),
         user: GetUser = Depends(get_authenticated_user),
+        db: AsyncSession = Depends(get_db),
         result_service: QuizResultService = Depends(QuizResultService),
         user_id: UUID = None,
         quiz_id: UUID = None,
         csv: bool = False
 ) -> list[RedisResult] | StreamingResponse:
     return await result_service.company_get_cashed_data(
-        db=db, user=user, company_id=company_id, csv=csv, user_id=user_id, quiz_id=quiz_id
+        db=db, company_id=company_id, csv=csv, user=user, quiz_id=quiz_id, user_id=user_id
     )
