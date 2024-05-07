@@ -1,7 +1,8 @@
 import uuid
+from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import String, UUID, Boolean, ForeignKey, Integer
+from sqlalchemy import String, UUID, Boolean, ForeignKey, Integer, DateTime
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 from sqlalchemy.ext.mutable import MutableList
@@ -14,6 +15,11 @@ class RequestType(Enum):
     invitation = "invitation"
     member = "member"
     admin = "admin"
+
+
+class NotificationStatus(Enum):
+    sent = "sent"
+    read = "read"
 
 
 class IDBase(Base):
@@ -87,13 +93,28 @@ class QuizResult(IDBase):
         UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
     quiz_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("quiz.id", ondelete="CASCADE"), nullable=True
+        UUID(as_uuid=True), ForeignKey("quiz.id", ondelete="CASCADE"), nullable=False
     )
     company_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("company.id", ondelete="CASCADE"), nullable=True
+        UUID(as_uuid=True), ForeignKey("company.id", ondelete="CASCADE"), nullable=False
     )
     all_results: Mapped[JSONB] = mapped_column(MutableList.as_mutable(JSONB()), nullable=False)
 
     user: Mapped[User] = Relationship("User", lazy="selectin")
     quiz: Mapped[Quiz] = Relationship("Quiz", lazy="selectin")
     company: Mapped[Company] = Relationship("Company", lazy="selectin")
+
+
+class Notification(IDBase):
+    __tablename__ = "notification"
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+    user_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), nullable=False
+    )
+    message: Mapped[str] = mapped_column(String(500), nullable=False)
+    status: Mapped[NotificationStatus] = mapped_column(
+        ENUM(NotificationStatus, name="notification_status"), nullable=False, default="sent"
+    )
+
+    user: Mapped[User] = Relationship("User", lazy="selectin")
