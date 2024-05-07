@@ -1,4 +1,5 @@
 from datetime import datetime
+import csv
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,11 +11,11 @@ from app.db.alembic.repos.quiz_repo import QuizRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.db.alembic.repos.quiz_result_repo import QuizResultRepository
 from app.db.models import RequestType
+from app.db.redis import DBRedisManager
 from app.permissions import check_permissions
 from app.schemas.quiz import GetQuiz
 from app.schemas.quiz_result import Answers, GetQuizResult, Rating
 from app.schemas.users import GetUser
-from app.services.redis import RedisService
 
 
 class QuizResultService:
@@ -23,7 +24,7 @@ class QuizResultService:
         self._request_repo = RequestRepository()
         self._quiz_repo = QuizRepository()
         self._company_repo = CompanyRepository()
-        self._redis_service = RedisService()
+        self._redis = DBRedisManager()
 
     async def check_user_is_member(self, user: GetUser, company_id: UUID, db: AsyncSession) -> None:
         try:
@@ -97,6 +98,20 @@ class QuizResultService:
             }
         )
 
+    async def redis_update_or_create_result(self, user: GetUser, quiz: GetQuiz, answers: list[Answers]) -> None:
+        result = await self._redis.get_value(f"{quiz.company.id}, {quiz.id}, {user.id}")
+        if result:
+            result["value"]["answers"].extend(answers)
+            await self._redis.set_value(**result)
+        else:
+            redis_data = {
+                "user_id": user.id,
+                "company_id": quiz.company_id,
+                "quiz_id": quiz.id,
+                "answers": answers
+            }
+            await self._redis.set_value(f"{quiz.company.id}, {quiz.id}, {user.id}", redis_data)
+
     async def get_quiz_results(
             self,
             db: AsyncSession,
@@ -141,6 +156,19 @@ class QuizResultService:
         )
         return self.count_rating(data=data)
 
+    @staticmethod
+    async def data_to_csv(data: list[dict], filename: str):
+        headers = list(data[0].keys())
+        with open(filename, "w+") as file:
+            writer = csv.DictWriter(file, fieldnames=headers)
+            writer.writeheader()
+            writer.writerows(data)
+            yield file.read()
+
+    async def export_csv(self, data: list[dict], filename: str):
+        file = self.data_to_csv(data, filename)
+        return StreamingResponse(file)
+
     async def user_get_cashed_data(
             self,
             user: GetUser,
@@ -148,9 +176,9 @@ class QuizResultService:
             csv: bool = False,
     ) -> list[dict] | StreamingResponse:
         check_permissions(user_id=user_id, user=user)
-        data = await self._redis_service.get_data_from_redis(f"*{user_id}")
+        data = await self._redis.get_by_part_of_key(f"*{user_id}")
         if csv:
-            return await self._redis_service.export_csv(data=data, filename="user_results.csv")
+            return await self.export_csv(data=data, filename="user_results.csv")
         return data
 
     async def company_get_cashed_data(
@@ -163,11 +191,11 @@ class QuizResultService:
             quiz_id: UUID = None
     ) -> list[dict] | StreamingResponse:
         await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
-        data = await self._redis_service.get_data_from_redis(f"{company_id}*")
+        data = await self._redis.get_by_part_of_key(f"{company_id}*")
         if user_id:
             data = [info for info in data if info["user_id"] == user_id]
         if quiz_id:
             data = [info for info in data if info["quiz_id"] == quiz_id]
         if csv:
-            return await self._redis_service.export_csv(data=data, filename="company_results.csv")
+            return await self.export_csv(data=data, filename="company_results.csv")
         return data
