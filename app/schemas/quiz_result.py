@@ -36,8 +36,7 @@ class Rating(BaseModel):
 
 
 class RedisResult(BaseModel):
-    user: GetUser
-    company: GetCompany
-    quiz: GetQuiz
+    user_id: UUID
+    company_id: UUID
+    quiz_id: UUID
     answers: list[Answers]
-
