@@ -1,4 +1,3 @@
-
 from datetime import datetime
 import csv
 from uuid import UUID
