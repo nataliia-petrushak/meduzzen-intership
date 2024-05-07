@@ -4,6 +4,7 @@ from typing import Any
 
 from redis.asyncio import ConnectionPool, Redis
 from app.config import settings
+from app.logger import custom_logger
 
 
 class DBRedisManager:
@@ -15,16 +16,16 @@ class DBRedisManager:
 
     async def get_value(self, key: Any) -> dict | None:
         if value := await self._redis_client.get(key):
-            return {"key": key, "value": pickle.loads(value)}
+            return pickle.loads(value)
         return None
 
-    async def set_value(self, key: Any, value: Any) -> dict:
+    async def set_value(self, key: Any, value: Any) -> None:
         await self._redis_client.set(key, pickle.dumps(value), ex=timedelta(hours=48))
-        return {"message": f"Value '{value}' written to Redis with key '{key}'"}
+        custom_logger.info(f"Value '{value}' written to Redis with key '{key}'")
 
     async def get_by_part_of_key(self, key_part: Any) -> list[dict]:
         result = []
-        async for key in self._redis_client.scan_iter(key_part):
+        for key in await self._redis_client.keys(key_part):
             value = await self._redis_client.get(key)
             result.append(pickle.loads(value))
         return result
