@@ -43,7 +43,7 @@ def upgrade() -> None:
             "status",
             ENUM("unread", "read", name="status"), default="unread"
         ),
-        sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
+        sa.ForeignKeyConstraint(["quiz_id"], ["quiz.id"]),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
     )
 
