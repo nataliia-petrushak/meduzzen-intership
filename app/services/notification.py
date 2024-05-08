@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.alembic.repos.notification import NotificationRepository
 from app.db.models import NotificationStatus
 from app.permissions import check_permissions
-from app.routers import user
 from app.schemas.notification import GetNotification
 from app.schemas.users import GetUser
 
@@ -34,4 +33,3 @@ class NotificationService:
         return await self._notification_repo.get_model_list(
             db=db, filters={"user_id": user_id}, limit=limit, offset=offset
         )
-

@@ -11,9 +11,11 @@ class NotificationBase(BaseModel):
 
 class NotificationCreate(NotificationBase):
     user_id: UUID
+    quiz_id: UUID
 
 
 class GetNotification(NotificationBase):
     id: UUID
     user_id: UUID
+    quiz_id: UUID
     status: NotificationStatus

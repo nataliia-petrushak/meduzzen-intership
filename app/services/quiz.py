@@ -43,6 +43,7 @@ class QuizService:
                 db=db,
                 model_data={
                     "user_id": member.id,
+                    "quiz_id": quiz_id,
                     "message": f"Your company created a new quiz - {quiz_id}. Try to finish it"
                 }
             )

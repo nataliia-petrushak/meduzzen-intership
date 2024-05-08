@@ -32,11 +32,18 @@ def upgrade() -> None:
             sa.ForeignKey("user.id", ondelete="CASCADE"),
             nullable=False
         ),
+        sa.Column(
+            "quiz_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("quiz.id", ondelete="CASCADE"),
+            nullable=False
+        ),
         sa.Column("message", sa.String(500), nullable=False),
         sa.Column(
             "status",
             ENUM("unread", "read", name="status"), default="unread"
         ),
+        sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
     )
 
