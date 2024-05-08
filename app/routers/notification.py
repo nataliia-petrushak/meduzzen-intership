@@ -5,7 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.db.database import get_db
-from app.schemas.notification import GetNotification, NotificationUpdate
+from app.db.models import NotificationStatus
+from app.schemas.notification import GetNotification
 from app.schemas.users import GetUser
 from app.services.auth import get_authenticated_user
 from app.services.notification import NotificationService
@@ -39,7 +40,7 @@ async def get_notification_list(
 async def change_notification_status(
         user_id: UUID,
         notification_id: UUID,
-        data: NotificationUpdate,
+        status: NotificationStatus,
         user: GetUser = Depends(get_authenticated_user),
         notification_service: NotificationService = Depends(NotificationService),
         db: AsyncSession = Depends(get_db),
@@ -47,7 +48,7 @@ async def change_notification_status(
     return await notification_service.change_notification_status(
         user_id=user_id,
         notification_id=notification_id,
-        data=data,
+        status=status,
         user=user,
         db=db
     )

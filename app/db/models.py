@@ -18,7 +18,7 @@ class RequestType(Enum):
 
 
 class NotificationStatus(Enum):
-    sent = "sent"
+    unread = "unread"
     read = "read"
 
 
@@ -114,7 +114,7 @@ class Notification(IDBase):
     )
     message: Mapped[str] = mapped_column(String(500), nullable=False)
     status: Mapped[NotificationStatus] = mapped_column(
-        ENUM(NotificationStatus, name="notification_status"), nullable=False, default="sent"
+        ENUM(NotificationStatus, name="status"), default="unread"
     )
 
     user: Mapped[User] = Relationship("User", lazy="selectin")

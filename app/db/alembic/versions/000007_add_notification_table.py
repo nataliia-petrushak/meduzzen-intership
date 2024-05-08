@@ -35,7 +35,7 @@ def upgrade() -> None:
         sa.Column("message", sa.String(500), nullable=False),
         sa.Column(
             "status",
-            ENUM("sent", "read", name="notification_status"), default="sent"
+            ENUM("unread", "read", name="status"), default="unread"
         ),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
     )

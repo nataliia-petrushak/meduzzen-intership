@@ -3,9 +3,10 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.alembic.repos.notification import NotificationRepository
+from app.db.models import NotificationStatus
 from app.permissions import check_permissions
 from app.routers import user
-from app.schemas.notification import GetNotification, NotificationUpdate
+from app.schemas.notification import GetNotification
 from app.schemas.users import GetUser
 
 
@@ -19,11 +20,11 @@ class NotificationService:
             user_id: UUID,
             user: GetUser,
             db: AsyncSession,
-            data: NotificationUpdate
+            status: NotificationStatus
     ) -> GetNotification:
         check_permissions(user_id=user_id, user=user)
         return await self._notification_repo.update_model(
-            db=db, model_data=data.model_dump(), model_id=notification_id
+            db=db, model_data={"status": status}, model_id=notification_id
         )
 
     async def user_get_notification_list(
