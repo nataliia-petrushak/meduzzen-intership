@@ -18,4 +18,4 @@ class GetNotification(NotificationBase):
     id: UUID
     user_id: UUID
     quiz_id: UUID
-    status: NotificationStatus
+    notification_status: NotificationStatus

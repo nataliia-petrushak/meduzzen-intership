@@ -116,8 +116,8 @@ class Notification(IDBase):
         UUID(as_uuid=True), ForeignKey("quiz.id", ondelete="CASCADE"), nullable=False
     )
     message: Mapped[str] = mapped_column(String(500), nullable=False)
-    status: Mapped[NotificationStatus] = mapped_column(
-        ENUM(NotificationStatus, name="status"), default="unread"
+    notification_status: Mapped[NotificationStatus] = mapped_column(
+        ENUM(NotificationStatus, name="notification_status"), default="unread"
     )
 
     user: Mapped[User] = Relationship("User", lazy="selectin")

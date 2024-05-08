@@ -19,11 +19,11 @@ class NotificationService:
             user_id: UUID,
             user: GetUser,
             db: AsyncSession,
-            status: NotificationStatus
+            notification_status: NotificationStatus
     ) -> GetNotification:
         check_permissions(user_id=user_id, user=user)
         return await self._notification_repo.update_model(
-            db=db, model_data={"status": status}, model_id=notification_id
+            db=db, model_data={"notification_status": notification_status}, model_id=notification_id
         )
 
     async def user_get_notification_list(

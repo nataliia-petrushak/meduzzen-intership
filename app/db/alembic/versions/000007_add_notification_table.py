@@ -40,8 +40,8 @@ def upgrade() -> None:
         ),
         sa.Column("message", sa.String(500), nullable=False),
         sa.Column(
-            "status",
-            ENUM("unread", "read", name="status"), default="unread"
+            "notification_status",
+            ENUM("unread", "read", name="notification_status"), default="unread"
         ),
         sa.ForeignKeyConstraint(["quiz_id"], ["quiz.id"]),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"]),

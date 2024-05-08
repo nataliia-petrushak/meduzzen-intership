@@ -32,7 +32,7 @@ async def get_notification_list(
     )
 
 
-@router.post(
+@router.patch(
     "/{user_id}/notification/{notification_id}",
     response_model=GetNotification,
     status_code=status.HTTP_200_OK
@@ -40,7 +40,7 @@ async def get_notification_list(
 async def change_notification_status(
         user_id: UUID,
         notification_id: UUID,
-        status: NotificationStatus,
+        notification_status: NotificationStatus,
         user: GetUser = Depends(get_authenticated_user),
         notification_service: NotificationService = Depends(NotificationService),
         db: AsyncSession = Depends(get_db),
@@ -48,7 +48,7 @@ async def change_notification_status(
     return await notification_service.change_notification_status(
         user_id=user_id,
         notification_id=notification_id,
-        status=status,
+        notification_status=notification_status,
         user=user,
         db=db
     )
