@@ -61,13 +61,16 @@ async def get_user_company_rating(
     response_model=list[RedisResult] | None,
     status_code=status.HTTP_200_OK
 )
-async def get_cached_results(
+async def user_get_cached_results(
         user_id: UUID,
         user: GetUser = Depends(get_authenticated_user),
         result_service: QuizResultService = Depends(QuizResultService),
         csv: bool = False,
 ) -> list[RedisResult] | StreamingResponse:
-    return await result_service.user_get_cashed_data(user_id=user_id, user=user, csv=csv)
+    data = await result_service.user_get_cashed_data(user_id=user_id, user=user)
+    if csv:
+        return StreamingResponse(result_service.data_to_csv(data), media_type="text/csv")
+    return data
 
 
 @router.get("/{company_id}/cache", response_model=list[RedisResult] | None, status_code=status.HTTP_200_OK)
@@ -80,6 +83,9 @@ async def get_cached_results(
         quiz_id: UUID = None,
         csv: bool = False
 ) -> list[RedisResult] | StreamingResponse:
-    return await result_service.company_get_cashed_data(
-        db=db, company_id=company_id, csv=csv, user=user, quiz_id=quiz_id, user_id=user_id
+    data = await result_service.company_get_cashed_data(
+        db=db, company_id=company_id, user=user, quiz_id=quiz_id, user_id=user_id
     )
+    if csv:
+        return StreamingResponse(result_service.data_to_csv(data), media_type="text/csv")
+    return data
