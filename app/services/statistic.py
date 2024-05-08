@@ -81,13 +81,11 @@ class StatisticService:
         user_results = await self._result_repo.get_model_list(
             db=db, filters={"user_id": user_id}
         )
-        quiz_list = []
-        for result in user_results:
-            quiz = QuizWithCompleteTime(
+        return [
+            QuizWithCompleteTime(
                 quiz_id=result.quiz_id, date=result.all_results[-1]["date"]
-            )
-            quiz_list.append(quiz)
-        return quiz_list
+            ) for result in user_results
+        ]
 
     async def company_users_with_last_quiz_completion_time(
         self, db: AsyncSession, company_id: UUID, quiz_id: UUID, user: GetUser
@@ -96,10 +94,11 @@ class StatisticService:
         quiz_results = await self._result_repo.get_model_list(
             db=db, filters={"company_id": company_id, "quiz_id": quiz_id}
         )
-        user_list = []
-        for result in quiz_results:
-            user = UsersQuizCompleteTime(
+        return [
+            UsersQuizCompleteTime(
                 user_id=result.user_id, date=result.all_results[-1]["date"]
-            )
-            user_list.append(user)
-        return user_list
+            ) for result in quiz_results
+        ]
+
+
+
