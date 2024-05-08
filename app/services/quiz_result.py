@@ -1,10 +1,10 @@
 
 from datetime import datetime
 import csv
+from io import StringIO
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi.responses import StreamingResponse
 
 from app.core.exceptions import AccessDeniedError, ObjectNotFound
 from app.db.alembic.repos.company_repo import CompanyRepository
@@ -157,45 +157,35 @@ class QuizResultService:
         return self.count_rating(data=data)
 
     @staticmethod
-    async def data_to_csv(data: list[dict], filename: str):
-        headers = list(data[0].keys())
-        with open(filename, "w+") as file:
-            writer = csv.DictWriter(file, fieldnames=headers)
-            writer.writeheader()
-            writer.writerows(data)
-            yield file.read()
-
-    async def export_csv(self, data: list[dict], filename: str):
-        file = self.data_to_csv(data, filename)
-        return StreamingResponse(file)
+    async def data_to_csv(data: list):
+        fieldnames = list(data[0].keys())
+        csv_string = StringIO()
+        csv_writer = csv.DictWriter(csv_string, fieldnames=fieldnames)
+        csv_writer.writeheader()
+        for row in data:
+            csv_writer.writerow(row)
+            yield csv_string.getvalue()
 
     async def user_get_cashed_data(
             self,
             user: GetUser,
             user_id: UUID,
-            csv: bool = False,
-    ) -> list[dict] | StreamingResponse:
+    ) -> list:
         check_permissions(user_id=user_id, user=user)
-        data = await self._redis.get_by_part_of_key(f"*{user_id}")
-        if csv:
-            return await self.export_csv(data=data, filename="user_results.csv")
-        return data
+        return await self._redis.get_by_part_of_key(f"*{user_id}")
 
     async def company_get_cashed_data(
             self,
             db: AsyncSession,
             user: GetUser,
             company_id: UUID,
-            csv: bool = False,
             user_id: UUID = None,
             quiz_id: UUID = None
-    ) -> list[dict] | StreamingResponse:
+    ) -> list:
         await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
         data = await self._redis.get_by_part_of_key(f"{company_id}*")
         if user_id:
             data = [info for info in data if info["user_id"] == user_id]
         if quiz_id:
             data = [info for info in data if info["quiz_id"] == quiz_id]
-        if csv:
-            return await self.export_csv(data=data, filename="company_results.csv")
         return data
