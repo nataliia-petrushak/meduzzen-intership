@@ -98,16 +98,15 @@ class QuizResultService:
     async def redis_update_or_create_result(self, user: GetUser, quiz: GetQuiz, answers: list[Answers]) -> None:
         result = await self._redis.get_value(f"{quiz.company.id}, {quiz.id}, {user.id}")
         if result:
-            result["value"]["answers"].extend(answers)
-            await self._redis.set_value(**result)
+            result["answers"].extend(answers)
         else:
-            redis_data = {
+            result = {
                 "user_id": user.id,
                 "company_id": quiz.company_id,
                 "quiz_id": quiz.id,
                 "answers": answers
             }
-            await self._redis.set_value(f"{quiz.company.id}, {quiz.id}, {user.id}", redis_data)
+        await self._redis.set_value(f"{quiz.company.id}, {quiz.id}, {user.id}", result)
 
     async def get_quiz_results(
             self,
@@ -126,7 +125,7 @@ class QuizResultService:
         result = await self.create_or_update_result(
             quiz=quiz, user=user, db=db, num_corr_answers=num_corr_answers
         )
-        await self._redis_service.redis_update_or_create_result(user=user, quiz=quiz, answers=answers)
+        await self.redis_update_or_create_result(user=user, quiz=quiz, answers=answers)
         return result
 
     @staticmethod
