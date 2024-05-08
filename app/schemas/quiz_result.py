@@ -1,11 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field
-
-from app.schemas.company import GetCompany
-from app.schemas.quiz import GetQuiz
-from app.schemas.users import GetUser
+from pydantic import BaseModel
 
 
 class Answers(BaseModel):
@@ -15,7 +11,7 @@ class Answers(BaseModel):
 
 
 class AllQuizResults(BaseModel):
-    date: datetime = Field(default_factory=datetime.now)
+    date: datetime
     num_corr_answers: int
     questions_count: int
 

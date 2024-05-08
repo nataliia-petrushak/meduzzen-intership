@@ -1,3 +1,5 @@
+
+from datetime import datetime
 import csv
 from uuid import UUID
 
@@ -66,6 +68,7 @@ class QuizResultService:
     ) -> GetQuizResult:
         all_results = result.all_results
         all_results.append({
+            "date": datetime.now().isoformat(),
             "num_corr_answers": num_corr_answers,
             "questions_count": len(quiz.questions)
         })
@@ -89,6 +92,7 @@ class QuizResultService:
                 "company_id": quiz.company_id,
                 "quiz_id": quiz.id,
                 "all_results": [{
+                    "date": datetime.now().isoformat(),
                     "num_corr_answers": num_corr_answers,
                     "questions_count": len(quiz.questions)
                 }]
@@ -148,7 +152,7 @@ class QuizResultService:
         if company_id:
             filters["company_id"] = company_id
 
-        data = await self._quiz_result_repo.get_user_results_records(
+        data = await self._quiz_result_repo.get_results_records(
             db=db, filters=filters
         )
         return self.count_rating(data=data)

@@ -27,6 +27,7 @@ app.include_router(user_request.router)
 app.include_router(quiz.router)
 app.include_router(quiz_result.router)
 app.include_router(notification.router)
+app.include_router(statistic.router)
 
 
 @app.exception_handler(ObjectNotFound)
