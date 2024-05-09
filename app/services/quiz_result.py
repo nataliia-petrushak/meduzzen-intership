@@ -27,33 +27,44 @@ class QuizResultService:
         self._company_repo = CompanyRepository()
         self._redis = DBRedisManager()
 
-    async def check_user_is_member(self, user: GetUser, company_id: UUID, db: AsyncSession) -> None:
+    async def check_user_is_member(
+        self, user: GetUser, company_id: UUID, db: AsyncSession
+    ) -> None:
         try:
-            await self._request_repo.get_model_by(db=db, filters={
+            await self._request_repo.get_model_by(
+                db=db,
+                filters={
                     "user_id": user.id,
                     "company_id": company_id,
-                    "request_type": RequestType.member
-                }
+                    "request_type": RequestType.member,
+                },
             )
         except ObjectNotFound:
             raise AccessDeniedError()
 
     async def check_user_is_admin_or_owner(
-            self, db: AsyncSession, company_id: UUID, user: GetUser
+        self, db: AsyncSession, company_id: UUID, user: GetUser
     ) -> None:
         try:
             request = await self._request_repo.get_model_by(
-                db=db, filters={"company_id": company_id, "user_id": user.id, "request_type": "admin"}
+                db=db,
+                filters={
+                    "company_id": company_id,
+                    "user_id": user.id,
+                    "request_type": "admin",
+                },
             )
         except ObjectNotFound:
             request = None
 
-        company = await self._company_repo.get_model_by(db=db, filters={"id": company_id})
+        company = await self._company_repo.get_model_by(
+            db=db, filters={"id": company_id}
+        )
         if not request and company.owner_id != user.id:
             raise AccessDeniedError()
 
     async def check_user_did_quiz_before(
-            self, quiz_id: UUID, db: AsyncSession, user: GetUser
+        self, quiz_id: UUID, db: AsyncSession, user: GetUser
     ) -> GetQuizResult | None:
         try:
             quiz_result = await self._quiz_result_repo.get_model_by(
@@ -64,25 +75,36 @@ class QuizResultService:
             return None
 
     async def update_quiz_result(
-            self, result: GetQuizResult, quiz: GetQuiz, num_corr_answers: int, db: AsyncSession
+        self,
+        result: GetQuizResult,
+        quiz: GetQuiz,
+        num_corr_answers: int,
+        db: AsyncSession,
     ) -> GetQuizResult:
         all_results = result.all_results
-        all_results.append({
-            "date": datetime.now().isoformat(),
-            "num_corr_answers": num_corr_answers,
-            "questions_count": len(quiz.questions)
-        })
-        return await self._quiz_result_repo.update_model(db=db, model_id=result.id, model_data={
-            "all_results": all_results
-        })
+        all_results.append(
+            {
+                "date": datetime.now().isoformat(),
+                "num_corr_answers": num_corr_answers,
+                "questions_count": len(quiz.questions),
+            }
+        )
+        return await self._quiz_result_repo.update_model(
+            db=db, model_id=result.id, model_data={"all_results": all_results}
+        )
 
     async def create_or_update_result(
-            self, quiz: GetQuiz, user: GetUser, db: AsyncSession, num_corr_answers: int
+        self, quiz: GetQuiz, user: GetUser, db: AsyncSession, num_corr_answers: int
     ) -> GetQuizResult:
-        previous_result = await self.check_user_did_quiz_before(quiz_id=quiz.id, user=user, db=db)
+        previous_result = await self.check_user_did_quiz_before(
+            quiz_id=quiz.id, user=user, db=db
+        )
         if previous_result:
             return await self.update_quiz_result(
-                db=db, result=previous_result, num_corr_answers=num_corr_answers, quiz=quiz
+                db=db,
+                result=previous_result,
+                num_corr_answers=num_corr_answers,
+                quiz=quiz,
             )
 
         return await self._quiz_result_repo.create_model(
@@ -91,15 +113,19 @@ class QuizResultService:
                 "user_id": user.id,
                 "company_id": quiz.company_id,
                 "quiz_id": quiz.id,
-                "all_results": [{
-                    "date": datetime.now().isoformat(),
-                    "num_corr_answers": num_corr_answers,
-                    "questions_count": len(quiz.questions)
-                }]
-            }
+                "all_results": [
+                    {
+                        "date": datetime.now().isoformat(),
+                        "num_corr_answers": num_corr_answers,
+                        "questions_count": len(quiz.questions),
+                    }
+                ],
+            },
         )
 
-    async def redis_update_or_create_result(self, user: GetUser, quiz: GetQuiz, answers: list[Answers]) -> None:
+    async def redis_update_or_create_result(
+        self, user: GetUser, quiz: GetQuiz, answers: list[Answers]
+    ) -> None:
         result = await self._redis.get_value(f"{quiz.company.id}, {quiz.id}, {user.id}")
         if result:
             result["answers"].extend(answers)
@@ -108,16 +134,12 @@ class QuizResultService:
                 "user_id": user.id,
                 "company_id": quiz.company_id,
                 "quiz_id": quiz.id,
-                "answers": answers
+                "answers": answers,
             }
         await self._redis.set_value(f"{quiz.company.id}, {quiz.id}, {user.id}", result)
 
     async def get_quiz_results(
-            self,
-            db: AsyncSession,
-            quiz_id: UUID,
-            user: GetUser,
-            answers: list[Answers]
+        self, db: AsyncSession, quiz_id: UUID, user: GetUser, answers: list[Answers]
     ) -> GetQuizResult:
         quiz = await self._quiz_repo.get_model_by(db=db, filters={"id": quiz_id})
         num_corr_answers = len([answer for answer in answers if answer.is_correct])
@@ -143,7 +165,7 @@ class QuizResultService:
         return Rating(rating=rating)
 
     async def count_rating_for_user(
-            self, db: AsyncSession, user_id: UUID, user: GetUser, company_id: UUID = None
+        self, db: AsyncSession, user_id: UUID, user: GetUser, company_id: UUID = None
     ) -> Rating:
         check_permissions(user_id=user_id, user=user)
 
@@ -151,9 +173,7 @@ class QuizResultService:
         if company_id:
             filters["company_id"] = company_id
 
-        data = await self._quiz_result_repo.get_results_records(
-            db=db, filters=filters
-        )
+        data = await self._quiz_result_repo.get_results_records(db=db, filters=filters)
         return self.count_rating(data=data)
 
     @staticmethod
@@ -167,20 +187,20 @@ class QuizResultService:
             yield csv_string.getvalue()
 
     async def user_get_cashed_data(
-            self,
-            user: GetUser,
-            user_id: UUID,
+        self,
+        user: GetUser,
+        user_id: UUID,
     ) -> list:
         check_permissions(user_id=user_id, user=user)
         return await self._redis.get_by_part_of_key(f"*{user_id}")
 
     async def company_get_cashed_data(
-            self,
-            db: AsyncSession,
-            user: GetUser,
-            company_id: UUID,
-            user_id: UUID = None,
-            quiz_id: UUID = None
+        self,
+        db: AsyncSession,
+        user: GetUser,
+        company_id: UUID,
+        user_id: UUID = None,
+        quiz_id: UUID = None,
     ) -> list:
         await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
         data = await self._redis.get_by_part_of_key(f"{company_id}*")

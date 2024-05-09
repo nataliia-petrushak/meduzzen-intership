@@ -103,7 +103,9 @@ class QuizResult(IDBase):
     company_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("company.id", ondelete="CASCADE"), nullable=False
     )
-    all_results: Mapped[JSONB] = mapped_column(MutableList.as_mutable(JSONB()), nullable=False)
+    all_results: Mapped[JSONB] = mapped_column(
+        MutableList.as_mutable(JSONB()), nullable=False
+    )
 
     user: Mapped[User] = Relationship("User", lazy="selectin")
     quiz: Mapped[Quiz] = Relationship("Quiz", lazy="selectin")
@@ -113,7 +115,9 @@ class QuizResult(IDBase):
 class Notification(IDBase):
     __tablename__ = "notification"
 
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=datetime.utcnow
+    )
     user_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )

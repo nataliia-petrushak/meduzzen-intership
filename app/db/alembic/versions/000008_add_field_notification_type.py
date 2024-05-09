@@ -5,6 +5,7 @@ Revises: 000007
 Create Date: 2024-05-09 17:02:12.092774
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -23,7 +24,9 @@ def upgrade() -> None:
         "notification",
         sa.Column(
             "notification_type",
-            ENUM("new_quiz", "reminder", name="notification_type"), default="new_quiz")
+            ENUM("new_quiz", "reminder", name="notification_type"),
+            default="new_quiz",
+        ),
     )
 
 

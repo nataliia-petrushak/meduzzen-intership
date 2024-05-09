@@ -106,12 +106,12 @@ class CompanyRequestService:
         await db.commit()
 
     async def company_change_member_role(
-            self,
-            db: AsyncSession,
-            company_id: UUID,
-            user_id: UUID,
-            user: GetUser,
-            request_type: RequestType,
+        self,
+        db: AsyncSession,
+        company_id: UUID,
+        user_id: UUID,
+        user: GetUser,
+        request_type: RequestType,
     ) -> GetRequest:
         company = await self._company_repo.get_model_by(
             db=db, filters={"id": company_id}
@@ -130,12 +130,16 @@ class CompanyRequestService:
         )
 
     async def company_admin_list(
-            self,
-            db: AsyncSession,
-            company_id: UUID,
-            offset: int = 0,
-            limit: int = 10,
+        self,
+        db: AsyncSession,
+        company_id: UUID,
+        offset: int = 0,
+        limit: int = 10,
     ) -> list[GetUser]:
         return await self._request_repo.request_list(
-            db=db, company_id=company_id, request_type="admin", offset=offset, limit=limit
+            db=db,
+            company_id=company_id,
+            request_type="admin",
+            offset=offset,
+            limit=limit,
         )

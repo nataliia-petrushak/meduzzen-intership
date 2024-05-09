@@ -18,20 +18,27 @@ class NotificationService:
         self._result_repo = QuizResultRepository()
 
     async def change_notification_status(
-            self,
-            notification_id: UUID,
-            user_id: UUID,
-            user: GetUser,
-            db: AsyncSession,
-            notification_status: NotificationStatus
+        self,
+        notification_id: UUID,
+        user_id: UUID,
+        user: GetUser,
+        db: AsyncSession,
+        notification_status: NotificationStatus,
     ) -> GetNotification:
         check_permissions(user_id=user_id, user=user)
         return await self._notification_repo.update_model(
-            db=db, model_data={"notification_status": notification_status}, model_id=notification_id
+            db=db,
+            model_data={"notification_status": notification_status},
+            model_id=notification_id,
         )
 
     async def user_get_notification_list(
-            self, user_id: UUID, user: GetUser, db: AsyncSession, offset: int = 0, limit: int = 10
+        self,
+        user_id: UUID,
+        user: GetUser,
+        db: AsyncSession,
+        offset: int = 0,
+        limit: int = 10,
     ) -> list[GetNotification]:
         check_permissions(user_id=user_id, user=user)
         return await self._notification_repo.get_model_list(
@@ -41,15 +48,21 @@ class NotificationService:
     async def get_overdue_quiz_list(self, db: AsyncSession) -> list[OverdueQuiz]:
         results = await self._result_repo.get_overdue_quiz_results(db=db)
         return [
-            OverdueQuiz(
-                quiz_id=quiz_id, user_id=user_id, user_email=user_email
-            ) for quiz_id, user_id, user_email in results
+            OverdueQuiz(quiz_id=quiz_id, user_id=user_id, user_email=user_email)
+            for quiz_id, user_id, user_email in results
         ]
 
-    async def check_notification_sent(self, user_id: UUID, quiz_id: UUID, db: AsyncSession) -> bool:
+    async def check_notification_sent(
+        self, user_id: UUID, quiz_id: UUID, db: AsyncSession
+    ) -> bool:
         try:
             await self._notification_repo.get_model_by(
-                db=db, filters={"user_id": user_id, "quiz_id": quiz_id, "notification_type": "reminder"}
+                db=db,
+                filters={
+                    "user_id": user_id,
+                    "quiz_id": quiz_id,
+                    "notification_type": "reminder",
+                },
             )
             return True
         except ObjectNotFound:
@@ -59,15 +72,17 @@ class NotificationService:
         users_data = await self.get_overdue_quiz_list(db=db)
         for user_data in users_data:
             is_sent = await self.check_notification_sent(
-                user_id=user_data.user_id, quiz_id=user_data.quiz_id, db=db)
+                user_id=user_data.user_id, quiz_id=user_data.quiz_id, db=db
+            )
             if not is_sent:
                 custom_logger.info(f"Sending notification to {user_data.user_id}")
                 await self._notification_repo.create_model(
-                    db=db, model_data={
+                    db=db,
+                    model_data={
                         "user_id": user_data.user_id,
                         "quiz_id": user_data.quiz_id,
                         "notification_type": "reminder",
                         "message": f"You have finished quiz - "
-                                   f"{user_data.quiz_id} too long ago, please try again"
-                    }
+                        f"{user_data.quiz_id} too long ago, please try again",
+                    },
                 )
