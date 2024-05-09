@@ -25,7 +25,7 @@ def upgrade() -> None:
         sa.Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
         sa.Column(
             "request_type",
-            ENUM("invitation", "join_request", "member", name="request_type"),
+            ENUM("invitation", "join_request", "member", "admin", name="request_type"),
             nullable=False
         ),
         sa.Column(

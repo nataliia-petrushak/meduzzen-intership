@@ -13,6 +13,7 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import UUID
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.mutable import MutableList
 
 # revision identifiers, used by Alembic.
 revision: str = "000006"
@@ -43,7 +44,7 @@ def upgrade() -> None:
             sa.ForeignKey("company.id", ondelete="CASCADE"),
             nullable=False,
         ),
-        sa.Column("all_results", sa.MutableList.as_mutable(JSONB()), nullable=False),
+        sa.Column("all_results", MutableList.as_mutable(JSONB()), nullable=False),
         sa.ForeignKeyConstraint(["company_id"], ["company.id"]),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
         sa.ForeignKeyConstraint(["quiz_id"], ["quiz.id"]),

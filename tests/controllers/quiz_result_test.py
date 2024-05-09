@@ -117,4 +117,4 @@ async def test_user_get_total_rating_without_results(
     result = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert result["rating"] == None
+    assert result["rating"] is None

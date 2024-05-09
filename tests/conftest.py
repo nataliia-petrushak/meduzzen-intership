@@ -1,3 +1,4 @@
+import datetime
 from typing import AsyncGenerator
 from uuid import UUID
 
@@ -191,13 +192,13 @@ async def fill_db_with_results(fill_db_with_quizzes, user_id) -> None:
                     "user_id": user_id,
                     "company_id": quiz.company_id,
                     "quiz_id": quiz.id,
-                    "all_results": [{"num_corr_answers": 1, "questions_count": 3}]
+                    "all_results": [{"date": datetime.datetime.now().isoformat(), "num_corr_answers": 1, "questions_count": 3}]
                 },
                 {
                     "user_id": user_id,
                     "company_id": quiz.company_id,
                     "quiz_id": quiz.id,
-                    "all_results": [{"num_corr_answers": 2, "questions_count": 5}]
+                    "all_results": [{"date": datetime.datetime.now().isoformat(), "num_corr_answers": 2, "questions_count": 5}]
                 }
             ]))
         await conn.commit()
