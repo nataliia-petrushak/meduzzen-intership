@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import AccessDeniedError, ObjectNotFound
 from app.db.alembic.repos.company_repo import CompanyRepository
+from app.db.alembic.repos.notification import NotificationRepository
 from app.db.alembic.repos.quiz_repo import QuizRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.db.models import RequestType
@@ -17,6 +18,7 @@ class QuizService:
         self._quiz_repo = QuizRepository()
         self._company_repo = CompanyRepository()
         self._request_repo = RequestRepository()
+        self._notification_repo = NotificationRepository()
 
     async def check_user_is_admin_or_owner(
         self, db: AsyncSession, company_id: UUID, user: GetUser
@@ -32,6 +34,20 @@ class QuizService:
         if not request and company.owner_id != user.id:
             raise AccessDeniedError()
 
+    async def create_quiz_notifications(self, db: AsyncSession, quiz_id: UUID, company_id: UUID) -> None:
+        members = await self._request_repo.request_list(
+            db=db, request_type="member", company_id=company_id
+        )
+        for member in members:
+            await self._notification_repo.create_model(
+                db=db,
+                model_data={
+                    "user_id": member.id,
+                    "quiz_id": quiz_id,
+                    "message": f"Your company created a new quiz - {quiz_id}. Try to finish it"
+                }
+            )
+
     async def create_quiz(
         self, company_id: UUID, quiz_data: QuizCreate, user: GetUser, db: AsyncSession
     ) -> GetQuiz:
@@ -39,7 +55,9 @@ class QuizService:
         model_data = quiz_data.model_dump()
         model_data["company_id"] = company_id
 
-        return await self._quiz_repo.create_model(db=db, model_data=model_data)
+        quiz = await self._quiz_repo.create_model(db=db, model_data=model_data)
+        await self.create_quiz_notifications(db=db, company_id=company_id, quiz_id=quiz.id)
+        return quiz
 
     async def update_quiz(
         self,
