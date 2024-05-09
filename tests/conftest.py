@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from typing import AsyncGenerator
 from uuid import UUID
 
@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
 from app.db.database import Base
-from app.db.models import User, Company, Request, Quiz, QuizResult
+from app.db.models import User, Company, Request, Quiz, QuizResult, Notification
 from app.main import app
 from app.db.database import get_db
 from app.config import settings
@@ -51,13 +51,13 @@ async def fill_database():
 @pytest.fixture
 async def user_id(db: AsyncSession, fill_database) -> UUID:
     user_id = await db.execute(select(User.id).filter(User.username == "test_1"))
-    return user_id.scalars().one_or_none()
+    return user_id.scalar()
 
 
 @pytest.fixture
 async def owner_id(db: AsyncSession, fill_database) -> UUID:
     user_id = await db.execute(select(User.id).filter(User.username == "owner"))
-    return user_id.scalars().one_or_none()
+    return user_id.scalar()
 
 
 @pytest.fixture(scope="function")
@@ -72,7 +72,7 @@ async def fill_database_with_companies(owner_id: UUID):
 @pytest.fixture
 async def company_id(db: AsyncSession, fill_database_with_companies) -> UUID:
     user_id = await db.execute(select(Company.id).filter(Company.name == "test_1"))
-    return user_id.scalars().one_or_none()
+    return user_id.scalar()
 
 
 @pytest.fixture(scope="function")
@@ -97,7 +97,7 @@ async def invitation_id(db: AsyncSession, fill_db_with_invitations, company_id) 
     invitation_id = await db.execute(
         select(Request.id).filter(Request.company_id == company_id)
     )
-    return invitation_id.scalars().one_or_none()
+    return invitation_id.scalar()
 
 
 @pytest.fixture(scope="function")
@@ -120,7 +120,7 @@ async def fill_db_with_join_requests(company_id):
 @pytest.fixture
 async def request_id(db: AsyncSession, fill_db_with_join_requests, user_id) -> UUID:
     request_id = await db.execute(select(Request.id).filter(Request.user_id == user_id))
-    return request_id.scalars().one_or_none()
+    return request_id.scalar()
 
 
 @pytest.fixture(scope="function")
@@ -147,7 +147,7 @@ async def member_id(db: AsyncSession, fill_db_with_members, user_id) -> UUID:
         .join(Request, Request.user_id == User.id)
         .filter(Request.user_id == user_id)
     )
-    return member_id.scalars().one_or_none()
+    return member_id.scalar()
 
 
 @pytest.fixture(scope="function")
@@ -179,29 +179,90 @@ async def fill_db_with_quizzes(company_id):
 @pytest.fixture(scope="function")
 async def quiz_id(db: AsyncSession, fill_db_with_quizzes, company_id) -> UUID:
     quizzes = await db.execute(select(Quiz.id).filter(Quiz.company_id == company_id))
-    return quizzes.scalars().fetchall()[0]
+    return quizzes.scalar()
 
 
 @pytest.fixture(scope="function")
 async def fill_db_with_results(fill_db_with_quizzes, user_id) -> None:
+    date_1 = datetime(2024, 2, 2, 2, 2, 2).isoformat()
+    date_2 = datetime(2024, 3, 3, 3, 3, 3).isoformat()
     async with async_engine.begin() as conn:
         quizzes = await conn.execute(select(Quiz))
         for quiz in quizzes:
-            await conn.execute(insert(QuizResult).values([
-                {
-                    "user_id": user_id,
-                    "company_id": quiz.company_id,
-                    "quiz_id": quiz.id,
-                    "all_results": [{"date": datetime.datetime.now().isoformat(), "num_corr_answers": 1, "questions_count": 3}]
-                },
-                {
-                    "user_id": user_id,
-                    "company_id": quiz.company_id,
-                    "quiz_id": quiz.id,
-                    "all_results": [{"date": datetime.datetime.now().isoformat(), "num_corr_answers": 2, "questions_count": 5}]
-                }
-            ]))
+            await conn.execute(
+                insert(QuizResult).values(
+                    [
+                        {
+                            "user_id": user_id,
+                            "company_id": quiz.company_id,
+                            "quiz_id": quiz.id,
+                            "all_results": [
+                                {
+                                    "date": date_1,
+                                    "num_corr_answers": 1,
+                                    "questions_count": 3,
+                                }
+                            ],
+                        },
+                        {
+                            "user_id": user_id,
+                            "company_id": quiz.company_id,
+                            "quiz_id": quiz.id,
+                            "all_results": [
+                                {
+                                    "date": date_2,
+                                    "num_corr_answers": 2,
+                                    "questions_count": 5,
+                                }
+                            ],
+                        },
+                    ]
+                )
+            )
         await conn.commit()
+
+
+@pytest.fixture(scope="function")
+async def fill_db_with_notifications(fill_db_with_quizzes, user_id) -> None:
+    async with async_engine.begin() as conn:
+        quizzes = await conn.execute(select(Quiz))
+        for quiz in quizzes:
+            await conn.execute(
+                insert(Notification).values(
+                    [
+                        {
+                            "quiz_id": quiz.id,
+                            "user_id": user_id,
+                            "message": "Hello World!",
+                        },
+                        {
+                            "quiz_id": quiz.id,
+                            "user_id": user_id,
+                            "message": "Hello World!",
+                        },
+                        {
+                            "quiz_id": quiz.id,
+                            "user_id": user_id,
+                            "message": "Hello World!",
+                        },
+                        {
+                            "quiz_id": quiz.id,
+                            "user_id": user_id,
+                            "message": "Hello World!",
+                        },
+                    ]
+                )
+            )
+
+
+@pytest.fixture(scope="function")
+async def notification_id(
+    db: AsyncSession, fill_db_with_notifications, user_id
+) -> UUID:
+    quizzes = await db.execute(
+        select(Notification.id).filter(Notification.user_id == user_id)
+    )
+    return quizzes.scalar()
 
 
 @pytest.fixture
