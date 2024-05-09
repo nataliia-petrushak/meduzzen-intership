@@ -9,6 +9,7 @@ from tests.constants import (
     quiz_data_1_question,
     quiz_data_1_answer,
     quiz_update_data,
+    quiz_payload,
 )
 
 
@@ -203,3 +204,23 @@ async def test_user_delete_quiz_forbidden(
     )
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.asyncio
+async def test_user_get_quiz_list(
+    client: TestClient,
+    company_id: UUID,
+    token: str,
+    prepare_database,
+    fill_db_with_quizzes,
+) -> None:
+    response = client.get(
+        f"company/{company_id}/quiz",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    result = response.json()
+
+    assert response.status_code == status.HTTP_200_OK
+    assert result[0]["name"] == quiz_payload[0]["name"]
+    assert result[1]["name"] == quiz_payload[1]["name"]
+    assert result[2]["name"] == quiz_payload[2]["name"]
