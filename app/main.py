@@ -38,7 +38,7 @@ async def lifespan(application: FastAPI):
     scheduler = AsyncIOScheduler(timezone="Europe/Kyiv")
     scheduler.add_job(
         service.send_reminder_notifications,
-        "cron", day_of_week="mon-fri", hour=17, minute=51, second=0
+        "cron", day_of_week="mon-sun", hour=17, minute=51, second=0
     )
     scheduler.start()
     yield
