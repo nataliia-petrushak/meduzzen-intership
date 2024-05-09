@@ -1,4 +1,6 @@
 from app.db.alembic.repos.company_repo import CompanyRepository
+from app.db.alembic.repos.quiz_result_repo import QuizResultRepository
+from app.db.alembic.repos.request_repo import RequestRepository
 from app.schemas.users import UserSignUp, UserUpdate
 from app.db.alembic.repos.user_repo import UserRepository
 
@@ -48,7 +50,8 @@ quiz_payload = [
         "questions": [
             {"question": "1", "variants": ["1", "2"], "answers": ["1"]},
             {"question": "2", "variants": ["1", "2"], "answers": ["2"]},
-            {"question": "3", "variants": ["1", "3"], "answers": ["1", "3"]}],
+            {"question": "3", "variants": ["1", "3"], "answers": ["1", "3"]},
+        ],
     },
     {
         "name": "Test_1",
@@ -56,7 +59,8 @@ quiz_payload = [
         "questions": [
             {"question": "1", "variants": ["1", "2"], "answers": ["1"]},
             {"question": "2", "variants": ["1", "2"], "answers": ["2"]},
-            {"question": "3", "variants": ["1", "3"], "answers": ["1", "3"]}],
+            {"question": "3", "variants": ["1", "3"], "answers": ["1", "3"]},
+        ],
     },
     {
         "name": "Test_1",
@@ -64,16 +68,17 @@ quiz_payload = [
         "questions": [
             {"question": "1", "variants": ["1", "2"], "answers": ["1"]},
             {"question": "2", "variants": ["1", "2"], "answers": ["2"]},
-            {"question": "3", "variants": ["1", "3"], "answers": ["1", "3"]}],
-    }
+            {"question": "3", "variants": ["1", "3"], "answers": ["1", "3"]},
+        ],
+    },
 ]
+
 
 answers = [
     {"question": "1", "answers": ["2"], "is_correct": False},
     {"question": "2", "answers": ["2"], "is_correct": True},
-    {"question": "3", "answers": ["3", "1"], "is_correct": True}
+    {"question": "3", "answers": ["3", "1"], "is_correct": True},
 ]
-
 
 
 user_bad_data = {
@@ -104,15 +109,18 @@ pydentic_update_data = UserUpdate(username="Bruno", password="<PASSWORD>")
 
 user_repo = UserRepository()
 company_repo = CompanyRepository()
+quiz_result_repo = QuizResultRepository()
+request_repo = RequestRepository()
 
-company_data = {"name": "Test", "description": "", "is_hidden": False}
+company_data = {"name": "test_1", "description": "", "is_hidden": False}
 quiz_data = {
     "name": "Test",
     "description": "",
     "questions": [
         {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]},
         {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]},
-        {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]}],
+        {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]},
+    ],
 }
 quiz_update_data = {
     "name": "Test1",
@@ -120,7 +128,7 @@ quiz_update_data = {
     "questions": [
         {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]},
         {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]},
-        {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]}
+        {"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]},
     ],
 }
 quiz_data_1_question = {
@@ -134,6 +142,6 @@ quiz_data_1_answer = {
     "questions": [
         {"question": "1", "variants": ["1"], "answers": ["1"]},
         {"question": "1", "variants": ["1"], "answers": ["1"]},
-        {"question": "1", "variants": ["1"], "answers": ["1"]}
+        {"question": "1", "variants": ["1"], "answers": ["1"]},
     ],
 }
