@@ -1,11 +1,26 @@
+from contextlib import asynccontextmanager
+
 import uvicorn
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
 from starlette.responses import JSONResponse
 
-from app.routers import health, user, auth, company, user_request, company_request, quiz, quiz_result, statistic, notification
+from app.services.scheduler import SchedulerService
 from app.config import settings
+from app.routers import (
+    health,
+    user,
+    auth,
+    company,
+    user_request,
+    company_request,
+    quiz,
+    quiz_result,
+    statistic,
+    notification
+)
 from app.core.exceptions import (
     ObjectNotFound,
     AuthorizationError,
@@ -16,7 +31,21 @@ from app.core.exceptions import (
     ValidationError,
 )
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    service = SchedulerService()
+    scheduler = AsyncIOScheduler(timezone="Europe/Kyiv")
+    scheduler.add_job(
+        service.send_reminder_notifications,
+        "cron", day_of_week="mon-fri", hour=17, minute=51, second=0
+    )
+    scheduler.start()
+    yield
+    scheduler.shutdown()
+
+
+app = FastAPI(lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins)
 app.include_router(health.router)
 app.include_router(user.router)
@@ -26,8 +55,8 @@ app.include_router(company_request.router)
 app.include_router(user_request.router)
 app.include_router(quiz.router)
 app.include_router(quiz_result.router)
-app.include_router(statistic.router)
 app.include_router(notification.router)
+app.include_router(statistic.router)
 
 
 @app.exception_handler(ObjectNotFound)
