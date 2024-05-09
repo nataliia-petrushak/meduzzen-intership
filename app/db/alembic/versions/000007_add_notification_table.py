@@ -50,4 +50,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("notification")
-    op.execute("DROP TYPE status")
+    op.execute("DROP TYPE notification_status")

@@ -22,6 +22,11 @@ class NotificationStatus(Enum):
     read = "read"
 
 
+class NotificationType(Enum):
+    new_quiz = "new_quiz"
+    reminder = "reminder"
+
+
 class IDBase(Base):
     __abstract__ = True
     id: Mapped[UUID] = mapped_column(
@@ -118,6 +123,9 @@ class Notification(IDBase):
     message: Mapped[str] = mapped_column(String(500), nullable=False)
     notification_status: Mapped[NotificationStatus] = mapped_column(
         ENUM(NotificationStatus, name="notification_status"), default="unread"
+    )
+    notification_type: Mapped[NotificationType] = mapped_column(
+        ENUM(NotificationType, name="notification_type"), default="new_quiz"
     )
 
     user: Mapped[User] = Relationship("User", lazy="selectin")
