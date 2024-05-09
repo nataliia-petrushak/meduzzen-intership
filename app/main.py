@@ -39,9 +39,9 @@ async def lifespan(application: FastAPI):
     scheduler.add_job(
         service.send_reminder_notifications,
         "cron",
-        day_of_week="mon-fri",
-        hour=17,
-        minute=51,
+        day_of_week="mon-sun",
+        hour=0,
+        minute=0,
         second=0,
     )
     scheduler.start()
