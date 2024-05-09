@@ -29,4 +29,3 @@ class DBRedisManager:
             value = await self._redis_client.get(key)
             result.append(pickle.loads(value))
         return result
-

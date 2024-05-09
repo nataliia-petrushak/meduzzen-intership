@@ -5,6 +5,7 @@ Revises: 000003
 Create Date: 2024-04-26 16:12:10.159490
 
 """
+
 import uuid
 from typing import Sequence, Union
 from sqlalchemy import UUID
@@ -26,7 +27,7 @@ def upgrade() -> None:
         sa.Column(
             "request_type",
             ENUM("invitation", "join_request", "member", "admin", name="request_type"),
-            nullable=False
+            nullable=False,
         ),
         sa.Column(
             "company_id",

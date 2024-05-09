@@ -5,6 +5,7 @@ Revises: 000006
 Create Date: 2024-05-07 21:00:27.966836
 
 """
+
 import uuid
 from datetime import datetime
 from typing import Sequence, Union
@@ -30,18 +31,19 @@ def upgrade() -> None:
             "user_id",
             UUID(as_uuid=True),
             sa.ForeignKey("user.id", ondelete="CASCADE"),
-            nullable=False
+            nullable=False,
         ),
         sa.Column(
             "quiz_id",
             UUID(as_uuid=True),
             sa.ForeignKey("quiz.id", ondelete="CASCADE"),
-            nullable=False
+            nullable=False,
         ),
         sa.Column("message", sa.String(500), nullable=False),
         sa.Column(
             "notification_status",
-            ENUM("unread", "read", name="notification_status"), default="unread"
+            ENUM("unread", "read", name="notification_status"),
+            default="unread",
         ),
         sa.ForeignKeyConstraint(["quiz_id"], ["quiz.id"]),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"]),

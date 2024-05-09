@@ -6,3 +6,5 @@ venv/
 logs/
 app.egg-info
 build
+.coverage
+htmlcov

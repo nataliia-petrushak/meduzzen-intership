@@ -13,9 +13,7 @@ from app.services.quiz import QuizService
 router = APIRouter(tags=["quiz"], prefix="/company/{company_id}/quiz")
 
 
-@router.post(
-    "/", response_model=GetQuiz, status_code=status.HTTP_201_CREATED
-)
+@router.post("/", response_model=GetQuiz, status_code=status.HTTP_201_CREATED)
 async def create_quiz(
     company_id: UUID,
     quiz_data: QuizCreate,
@@ -28,9 +26,7 @@ async def create_quiz(
     )
 
 
-@router.get(
-    "/", response_model=list[GetQuiz], status_code=status.HTTP_200_OK
-)
+@router.get("/", response_model=list[GetQuiz], status_code=status.HTTP_200_OK)
 async def get_quiz_list(
     company_id: UUID,
     user: GetUser = Depends(get_authenticated_user),
@@ -40,7 +36,7 @@ async def get_quiz_list(
     quiz_service: QuizService = Depends(QuizService),
 ) -> list[GetQuiz]:
     return await quiz_service.get_quiz_list(
-        db=db, company_id=company_id, offset=offset, limit=limit, user=user
+        db=db, company_id=company_id, offset=offset, limit=limit
     )
 
 

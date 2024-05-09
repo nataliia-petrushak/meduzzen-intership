@@ -155,29 +155,33 @@ async def company_delete_member(
     )
 
 
-@router.patch(
-    "/{company_id}/members/{user_id}", status_code=status.HTTP_200_OK
-)
+@router.patch("/{company_id}/members/{user_id}", status_code=status.HTTP_200_OK)
 async def company_change_member_role(
-        company_id: UUID,
-        user_id: UUID,
-        request_type: RequestType,
-        user: GetUser = Depends(get_authenticated_user),
-        db: AsyncSession = Depends(get_db),
-        request_service: CompanyRequestService = Depends(CompanyRequestService)
+    company_id: UUID,
+    user_id: UUID,
+    request_type: RequestType,
+    user: GetUser = Depends(get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+    request_service: CompanyRequestService = Depends(CompanyRequestService),
 ) -> GetRequest:
     return await request_service.company_change_member_role(
-        db=db, company_id=company_id, user_id=user_id, user=user, request_type=request_type
+        db=db,
+        company_id=company_id,
+        user_id=user_id,
+        user=user,
+        request_type=request_type,
     )
 
 
-@router.get("/{company_id}/admins", response_model=list[GetUser], status_code=status.HTTP_200_OK)
+@router.get(
+    "/{company_id}/admins", response_model=list[GetUser], status_code=status.HTTP_200_OK
+)
 async def company_get_admin_list(
-        company_id: UUID,
-        db: AsyncSession = Depends(get_db),
-        request_service: CompanyRequestService = Depends(CompanyRequestService),
-        offset: int = 0,
-        limit: int = 10,
+    company_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    request_service: CompanyRequestService = Depends(CompanyRequestService),
+    offset: int = 0,
+    limit: int = 10,
 ) -> list[GetUser]:
     return await request_service.company_admin_list(
         db=db, company_id=company_id, offset=offset, limit=limit
