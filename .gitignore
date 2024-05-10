@@ -1,0 +1,10 @@
+.venv/
+.env
+venv/
+*__pycache__/
+.idea
+logs/
+app.egg-info
+build
+.coverage
+htmlcov
