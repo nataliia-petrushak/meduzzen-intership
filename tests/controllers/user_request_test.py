@@ -117,8 +117,8 @@ async def test_user_get_invitation_list(
     result = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert result[0]["name"] == company_payload[0]["name"]
-    assert result[1]["name"] == company_payload[1]["name"]
+    assert result[0]["company"]["name"] == company_payload[0]["name"]
+    assert result[1]["company"]["name"] == company_payload[1]["name"]
 
 
 @pytest.mark.asyncio
@@ -135,7 +135,7 @@ async def test_user_get_request_list(
     result = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert result[0]["name"] == company_payload[0]["name"]
+    assert result[0]["company"]["name"] == company_payload[0]["name"]
 
 
 @pytest.mark.asyncio

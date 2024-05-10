@@ -6,7 +6,7 @@ from starlette import status
 
 from app.db.database import get_db
 from app.schemas.company import GetCompany
-from app.schemas.request import GetRequest
+from app.schemas.request import GetRequest, CompanyRequest
 from app.schemas.users import GetUser
 from app.services.auth import get_authenticated_user
 from app.services.user_request import UserRequestService
@@ -80,7 +80,7 @@ async def user_cancel_join_request(
 
 @router.get(
     "/{user_id}/invitations",
-    response_model=list[GetCompany],
+    response_model=list[CompanyRequest],
     status_code=status.HTTP_200_OK,
 )
 async def user_invitation_list(
@@ -90,7 +90,7 @@ async def user_invitation_list(
     request_service: UserRequestService = Depends(UserRequestService),
     offset: int = 0,
     limit: int = 10,
-) -> list[GetCompany]:
+) -> list[CompanyRequest]:
     return await request_service.get_user_requests(
         db=db, user_id=user_id, offset=offset, limit=limit, user=user
     )
@@ -98,7 +98,7 @@ async def user_invitation_list(
 
 @router.get(
     "/{user_id}/join-requests",
-    response_model=list[GetCompany],
+    response_model=list[CompanyRequest],
     status_code=status.HTTP_200_OK,
 )
 async def user_join_request_list(
@@ -108,7 +108,7 @@ async def user_join_request_list(
     request_service: UserRequestService = Depends(UserRequestService),
     offset: int = 0,
     limit: int = 10,
-) -> list[GetCompany]:
+) -> list[CompanyRequest]:
     return await request_service.get_user_requests(
         db=db,
         user_id=user_id,

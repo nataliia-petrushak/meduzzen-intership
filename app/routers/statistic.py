@@ -38,7 +38,7 @@ async def get_user_avg_dynamic(
     response_model=list[AvgScoreWithTime],
     status_code=status.HTTP_200_OK,
 )
-async def get_company_all_users_avg_dynamic(
+async def get_company_users_avg_dynamic(
     company_id: UUID,
     user_id: UUID = None,
     db: AsyncSession = Depends(get_db),
@@ -55,7 +55,7 @@ async def get_company_all_users_avg_dynamic(
     response_model=list[QuizWithCompleteTime],
     status_code=status.HTTP_200_OK,
 )
-async def get_quiz_last_comp_time(
+async def get_last_completion_time_of_quizzes(
     user_id: UUID,
     user: GetUser = Depends(get_authenticated_user),
     statistic_service: StatisticService = Depends(StatisticService),
@@ -71,7 +71,7 @@ async def get_quiz_last_comp_time(
     response_model=list[UsersQuizCompleteTime],
     status_code=status.HTTP_200_OK,
 )
-async def get_users_last_comp_time_for_quiz(
+async def get_last_completion_time_of_quiz_for_users(
     company_id: UUID,
     quiz_id: UUID,
     user: GetUser = Depends(get_authenticated_user),

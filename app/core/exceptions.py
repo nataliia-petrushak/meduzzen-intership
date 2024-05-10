@@ -1,4 +1,5 @@
 from typing import Any
+from uuid import UUID
 
 
 class ObjectNotFound(Exception):
@@ -43,4 +44,10 @@ class AssignError(Exception):
 class ValidationError(Exception):
     def __init__(self, detail: str) -> None:
         self.msg = detail
+        super().__init__(self.msg)
+
+
+class IntegrityError(Exception):
+    def __init__(self, company_id: UUID, user_id: UUID) -> None:
+        self.msg = f"The object with company id {company_id} and user_id {user_id} already exists"
         super().__init__(self.msg)

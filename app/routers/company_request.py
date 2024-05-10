@@ -6,7 +6,7 @@ from starlette import status
 
 from app.db.database import get_db
 from app.db.models import RequestType
-from app.schemas.request import GetRequest
+from app.schemas.request import GetRequest, UserRequest
 from app.schemas.users import GetUser
 from app.services.auth import get_authenticated_user
 from app.services.company_request import CompanyRequestService
@@ -84,7 +84,7 @@ async def company_decline_join_request(
 
 @router.get(
     "/{company_id}/members",
-    response_model=list[GetUser],
+    response_model=list[UserRequest],
     status_code=status.HTTP_200_OK,
 )
 async def company_member_list(
@@ -93,7 +93,7 @@ async def company_member_list(
     db: AsyncSession = Depends(get_db),
     limit: int = 10,
     offset: int = 0,
-) -> list[GetUser]:
+) -> list[UserRequest]:
     return await request_service.get_company_members(
         db=db, company_id=company_id, limit=limit, offset=offset
     )
@@ -101,7 +101,7 @@ async def company_member_list(
 
 @router.get(
     "/{company_id}/invitations",
-    response_model=list[GetUser],
+    response_model=list[UserRequest],
     status_code=status.HTTP_200_OK,
 )
 async def company_invitation_list(
@@ -111,7 +111,7 @@ async def company_invitation_list(
     request_service: CompanyRequestService = Depends(CompanyRequestService),
     offset: int = 0,
     limit: int = 10,
-) -> list[GetUser]:
+) -> list[UserRequest]:
     return await request_service.get_company_requests(
         db=db, company_id=company_id, user=user, offset=offset, limit=limit
     )
@@ -119,7 +119,7 @@ async def company_invitation_list(
 
 @router.get(
     "/{company_id}/join-requests",
-    response_model=list[GetUser],
+    response_model=list[UserRequest],
     status_code=status.HTTP_200_OK,
 )
 async def company_join_request_list(
@@ -129,7 +129,7 @@ async def company_join_request_list(
     request_service: CompanyRequestService = Depends(CompanyRequestService),
     offset: int = 0,
     limit: int = 10,
-) -> list[GetUser]:
+) -> list[UserRequest]:
     return await request_service.get_company_requests(
         db=db,
         company_id=company_id,
@@ -174,15 +174,15 @@ async def company_change_member_role(
 
 
 @router.get(
-    "/{company_id}/admins", response_model=list[GetUser], status_code=status.HTTP_200_OK
+    "/{company_id}/admins", response_model=list[UserRequest], status_code=status.HTTP_200_OK
 )
-async def company_get_admin_list(
+async def company_admin_list(
     company_id: UUID,
     db: AsyncSession = Depends(get_db),
     request_service: CompanyRequestService = Depends(CompanyRequestService),
     offset: int = 0,
     limit: int = 10,
-) -> list[GetUser]:
+) -> list[UserRequest]:
     return await request_service.company_admin_list(
         db=db, company_id=company_id, offset=offset, limit=limit
     )

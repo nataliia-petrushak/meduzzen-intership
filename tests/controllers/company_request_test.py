@@ -166,9 +166,9 @@ async def test_get_company_member_list(
     result = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert result[1]["username"] == user_payload[1]["username"]
-    assert result[2]["username"] == user_payload[2]["username"]
-    assert result[3]["username"] == user_payload[3]["username"]
+    assert result[1]["user"]["username"] == user_payload[1]["username"]
+    assert result[2]["user"]["username"] == user_payload[2]["username"]
+    assert result[3]["user"]["username"] == user_payload[3]["username"]
 
 
 @pytest.mark.asyncio
@@ -186,7 +186,7 @@ async def test_owner_get_company_invitation_list(
     result = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert result[0]["username"] == user_payload[1]["username"]
+    assert result[0]["user"]["username"] == user_payload[1]["username"]
 
 
 @pytest.mark.asyncio
@@ -220,8 +220,8 @@ async def test_owner_get_company_request_list(
     result = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert result[1]["username"] == user_payload[1]["username"]
-    assert result[2]["username"] == user_payload[2]["username"]
+    assert result[1]["user"]["username"] == user_payload[1]["username"]
+    assert result[2]["user"]["username"] == user_payload[2]["username"]
 
 
 @pytest.mark.asyncio
@@ -367,6 +367,6 @@ async def test_company_admin_list(
 
     assert response.status_code == status.HTTP_200_OK
     assert len(result) == 5
-    assert result[0]["username"] == user_payload[0]["username"]
-    assert result[1]["username"] == user_payload[1]["username"]
-    assert result[2]["username"] == user_payload[2]["username"]
+    assert result[0]["user"]["username"] == user_payload[0]["username"]
+    assert result[1]["user"]["username"] == user_payload[1]["username"]
+    assert result[2]["user"]["username"] == user_payload[2]["username"]

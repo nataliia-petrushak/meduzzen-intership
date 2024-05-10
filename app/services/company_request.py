@@ -1,13 +1,14 @@
 from uuid import UUID
 
+import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import OwnerRequestError, AssignError
+from app.core.exceptions import OwnerRequestError, AssignError, IntegrityError
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.db.models import RequestType
 from app.permissions import check_permissions
-from app.schemas.request import GetRequest
+from app.schemas.request import GetRequest, UserRequest
 from app.schemas.users import GetUser
 
 
@@ -34,7 +35,10 @@ class CompanyRequestService:
             "user_id": user_id,
             "request_type": "invitation",
         }
-        return await self._request_repo.create_model(db=db, model_data=model_data)
+        try:
+            return await self._request_repo.create_model(db=db, model_data=model_data)
+        except sqlalchemy.exc.IntegrityError:
+            raise IntegrityError(company_id=company_id, user_id=user_id)
 
     async def company_cancel_request(
         self, db: AsyncSession, model_id: UUID, company_id: UUID, user: GetUser
@@ -64,17 +68,19 @@ class CompanyRequestService:
         offset: int = 0,
         limit: int = 10,
         request_type: str = "invitation",
-    ) -> list[GetUser]:
+    ) -> list[UserRequest]:
         company = await self._company_repo.get_model_by(
             db=db, filters={"id": company_id}
         )
         check_permissions(user_id=company.owner_id, user=user)
-        return await self._request_repo.request_list(
+        return await self._request_repo.get_model_list(
             db=db,
             offset=offset,
             limit=limit,
-            company_id=company_id,
-            request_type=request_type,
+            filters={
+                "company_id": company_id,
+                "request_type": request_type
+            }
         )
 
     async def get_company_members(
@@ -83,11 +89,13 @@ class CompanyRequestService:
         company_id: UUID,
         offset: int = 0,
         limit: int = 10,
-    ) -> list[GetUser]:
-        return await self._request_repo.request_list(
+    ) -> list[UserRequest]:
+        return await self._request_repo.get_model_list(
             db=db,
-            company_id=company_id,
-            request_type="member",
+            filters={
+                "company_id": company_id,
+                "request_type": "member"
+            },
             offset=offset,
             limit=limit,
         )
@@ -135,11 +143,10 @@ class CompanyRequestService:
         company_id: UUID,
         offset: int = 0,
         limit: int = 10,
-    ) -> list[GetUser]:
-        return await self._request_repo.request_list(
+    ) -> list[UserRequest]:
+        return await self._request_repo.get_model_list(
             db=db,
-            company_id=company_id,
-            request_type="admin",
+            filters={"company_id": company_id, "request_type": "admin"},
             offset=offset,
             limit=limit,
         )

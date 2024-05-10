@@ -44,14 +44,14 @@ class QuizService:
     async def create_quiz_notifications(
         self, db: AsyncSession, quiz_id: UUID, company_id: UUID
     ) -> None:
-        members = await self._request_repo.request_list(
-            db=db, request_type="member", company_id=company_id
+        members = await self._request_repo.get_model_list(
+            db=db, filters={"request_type": "member", "company_id": company_id}
         )
         for member in members:
             await self._notification_repo.create_model(
                 db=db,
                 model_data={
-                    "user_id": member.id,
+                    "user_id": member.user_id,
                     "quiz_id": quiz_id,
                     "message": f"Your company created a new quiz - {quiz_id}. Try to finish it",
                 },
