@@ -1,12 +1,14 @@
 from uuid import UUID
+
+import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import OwnerRequestError
+from app.core.exceptions import OwnerRequestError, IntegrityError
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.permissions import check_permissions
 from app.schemas.company import GetCompany
-from app.schemas.request import GetRequest
+from app.schemas.request import GetRequest, CompanyRequest
 from app.schemas.users import GetUser
 
 
@@ -41,7 +43,10 @@ class UserRequestService:
             "company_id": company_id,
             "request_type": "join_request",
         }
-        return await self._request_repo.create_model(db=db, model_data=model_data)
+        try:
+            return await self._request_repo.create_model(db=db, model_data=model_data)
+        except sqlalchemy.exc.IntegrityError:
+            raise IntegrityError(company_id=company_id, user_id=user_id)
 
     async def user_cancel_request(
         self, db: AsyncSession, user: GetUser, user_id: UUID, request_id: UUID
@@ -57,14 +62,13 @@ class UserRequestService:
         limit: int = 10,
         offset: int = 0,
         request_type: str = "invitation",
-    ) -> list[GetCompany]:
+    ) -> list[CompanyRequest]:
         check_permissions(user_id=user_id, user=user)
-        return await self._request_repo.request_list(
+        return await self._request_repo.get_model_list(
             db=db,
             limit=limit,
             offset=offset,
-            user_id=user_id,
-            request_type=request_type,
+            filters={"user_id": user_id, "request_type": request_type},
         )
 
     async def user_leave_company(

@@ -30,14 +30,15 @@ class QuizResultService:
         self, user: GetUser, company_id: UUID, db: AsyncSession
     ) -> None:
         try:
-            await self._request_repo.get_model_by(
+            request = await self._request_repo.get_model_by(
                 db=db,
                 filters={
                     "user_id": user.id,
-                    "company_id": company_id,
-                    "request_type": RequestType.member,
+                    "company_id": company_id
                 },
             )
+            if request.request_type not in [RequestType.member, RequestType.admin]:
+                raise AccessDeniedError()
         except ObjectNotFound:
             raise AccessDeniedError()
 
@@ -177,7 +178,7 @@ class QuizResultService:
 
     @staticmethod
     async def data_to_csv(data: list):
-        fieldnames = list(data[0].keys())
+        fieldnames = ["user_id",  "company_id", "quiz_id", "answers"]
         csv_string = StringIO()
         csv_writer = csv.DictWriter(csv_string, fieldnames=fieldnames)
         csv_writer.writeheader()

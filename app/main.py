@@ -29,6 +29,7 @@ from app.core.exceptions import (
     OwnerRequestError,
     AssignError,
     ValidationError,
+    IntegrityError,
 )
 
 
@@ -109,6 +110,13 @@ async def assign_inviting_error_handler(request: Request, exc: AssignError):
 async def validation_error_handler(request: Request, exc: ValidationError):
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content={"message": exc.msg}
+    )
+
+
+@app.exception_handler(IntegrityError)
+async def integrity_error_handler(request: Request, exc: IntegrityError):
+    return JSONResponse(
+        status_code=status.HTTP_409_CONFLICT, content={"message": exc.msg}
     )
 
 
