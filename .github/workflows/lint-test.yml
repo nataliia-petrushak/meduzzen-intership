@@ -93,7 +93,7 @@ jobs:
             --name meduzzen-intership-web-1 \
             -p 8000:8000 \
             --network network \
-            meduzzen-intership:latest
+            meduzzen-intership-web:latest
     
         
             
