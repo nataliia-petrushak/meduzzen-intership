@@ -99,6 +99,3 @@ class StatisticService:
                 user_id=result.user_id, date=result.all_results[-1]["date"]
             ) for result in quiz_results
         ]
-
-
-

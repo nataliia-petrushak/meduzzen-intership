@@ -29,7 +29,7 @@ def test_get_user_by_id_endpoint(
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["id"] == str(user_id)
 
-    response_2 = client.get(f"/users/af3efcf6-9c61-4865-832f-5250f7fb8aec")
+    response_2 = client.get("/users/af3efcf6-9c61-4865-832f-5250f7fb8aec")
     assert response_2.status_code == status.HTTP_404_NOT_FOUND
 
 
