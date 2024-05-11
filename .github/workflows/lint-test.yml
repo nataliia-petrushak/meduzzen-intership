@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v2
     
       - name: Build Docker image
-        run: docker build -t meduzzen-intership:latest
+        run: docker build . -t meduzzen-intership:latest
   
       - name: Save Docker image
         run: docker save meduzzen-intership:latest | gzip > meduzzen-intership.tar.gz
