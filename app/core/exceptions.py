@@ -49,5 +49,6 @@ class ValidationError(Exception):
 
 class IntegrityError(Exception):
     def __init__(self, company_id: UUID, user_id: UUID) -> None:
-        self.msg = f"The object with company id {company_id} and user_id {user_id} already exists"
+        self.msg = (f"The object with company id {company_id} "
+                    f"and user_id {user_id} already exists")
         super().__init__(self.msg)

@@ -178,7 +178,7 @@ class QuizResultService:
 
     @staticmethod
     async def data_to_csv(data: list):
-        fieldnames = ["user_id",  "company_id", "quiz_id", "answers"]
+        fieldnames = ["user_id", "company_id", "quiz_id", "answers"]
         csv_string = StringIO()
         csv_writer = csv.DictWriter(csv_string, fieldnames=fieldnames)
         csv_writer.writeheader()

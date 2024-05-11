@@ -55,7 +55,7 @@ async def test_get_company_by_id(
     assert response.status_code == status.HTTP_200_OK
     assert result["name"] == company_payload[0]["name"]
 
-    response_2 = client.get(f"/companies/af3efcf6-9c61-4865-832f-5250f7fb8aec")
+    response_2 = client.get("/companies/af3efcf6-9c61-4865-832f-5250f7fb8aec")
     assert response_2.status_code == status.HTTP_404_NOT_FOUND
 
 

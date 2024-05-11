@@ -51,7 +51,8 @@ class QuizService:
                 model_data={
                     "user_id": member.user_id,
                     "quiz_id": quiz_id,
-                    "message": f"Your company created a new quiz - {quiz_id}. Try to finish it",
+                    "message": f"Your company created a new "
+                               f"quiz - {quiz_id}. Try to finish it",
                 },
             )
 

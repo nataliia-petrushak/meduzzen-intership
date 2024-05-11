@@ -10,6 +10,7 @@ class Question(BaseModel):
     variants: list[str]
     answers: list[str]
 
+    @classmethod
     @field_validator("variants", mode="before")
     def validate_variants(cls, variants: list[str]):
         print(variants)
@@ -23,6 +24,7 @@ class QuizBase(BaseModel):
     description: str
     questions: list[Question]
 
+    @classmethod
     @field_validator("questions", mode="before")
     def validate_question(cls, value: list):
         if len(value) < 2:

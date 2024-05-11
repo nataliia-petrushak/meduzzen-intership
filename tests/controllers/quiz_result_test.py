@@ -85,7 +85,7 @@ async def test_user_get_total_rating(
 
 
 @pytest.mark.asyncio
-async def test_user_get_total_rating(
+async def test_user_get_company_rating(
     client: TestClient,
     company_id: UUID,
     user_id: UUID,

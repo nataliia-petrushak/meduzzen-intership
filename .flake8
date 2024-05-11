@@ -1,0 +1,15 @@
+[flake8]
+inline-quotes = "
+ignore = E203, E266, W503, N807, N818, F401, VNE003
+select = B,C,E,F,W,T4,B9,Q0,N8,VNE
+exclude =
+    .git,
+    __pycache__,
+    docs/source/conf.py,
+    old,
+    build,
+    dist
+    venv
+    .venv
+max-line-length = 90
+max-complexity = 18

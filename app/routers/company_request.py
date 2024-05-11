@@ -174,7 +174,9 @@ async def company_change_member_role(
 
 
 @router.get(
-    "/{company_id}/admins", response_model=list[UserRequest], status_code=status.HTTP_200_OK
+    "/{company_id}/admins",
+    response_model=list[UserRequest],
+    status_code=status.HTTP_200_OK
 )
 async def company_admin_list(
     company_id: UUID,
