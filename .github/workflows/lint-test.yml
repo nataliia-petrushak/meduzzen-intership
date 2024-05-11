@@ -89,5 +89,5 @@ jobs:
             --env-file /tmp/meduzzen-intership/.env \
             --name meduzzen-intership-web-1 \
             -p 8000:8000 \
-            --network network \
+            --network meduzzen-intership_network \
             meduzzen-intership-web:latest
