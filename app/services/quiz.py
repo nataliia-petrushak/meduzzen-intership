@@ -7,8 +7,6 @@ from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.notification import NotificationRepository
 from app.db.alembic.repos.quiz_repo import QuizRepository
 from app.db.alembic.repos.request_repo import RequestRepository
-from app.db.models import RequestType
-from app.permissions import check_permissions
 from app.schemas.quiz import QuizCreate, GetQuiz, QuizUpdate
 from app.schemas.users import GetUser
 

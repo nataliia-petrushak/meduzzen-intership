@@ -8,3 +8,4 @@ app.egg-info
 build
 .coverage
 htmlcov
+*.DS_Store
