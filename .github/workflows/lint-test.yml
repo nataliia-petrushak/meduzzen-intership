@@ -48,6 +48,7 @@ jobs:
           echo "AUTH0_ALGORITHMS=${{ secrets.AUTH0_ALGORITHMS }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "JWT_ALGORITHMS=${{ secrets.JWT_ALGORITHMS }}" >> .env
+          echo "PYTHONPATH=${{ secrets.PYTHONPATH }}" >> .env
     
       - name: Copy .env file to server
         uses: appleboy/scp-action@master
