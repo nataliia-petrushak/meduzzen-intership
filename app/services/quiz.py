@@ -1,5 +1,9 @@
+import json
+from io import BytesIO
 from uuid import UUID
 
+import pandas as pd
+from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import AccessDeniedError, ObjectNotFound
@@ -100,3 +104,27 @@ class QuizService:
     ) -> None:
         await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
         await self._quiz_repo.delete_model(db=db, model_id=quiz_id)
+
+    async def upload_quiz_from_excel(
+            self,
+            file: UploadFile,
+            db: AsyncSession,
+            company_id: UUID,
+            user: GetUser
+    ) -> list[GetQuiz]:
+        await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
+        content = await file.read()
+        quiz_data = pd.read_excel(BytesIO(content))
+        result = []
+        for _, data in quiz_data.iterrows():
+            data["questions"] = json.loads(data["questions"])
+            if "quiz_id" in data:
+                quiz_id = UUID(data.pop("quiz_id"))
+                quiz = await self._quiz_repo.update_model(
+                    db=db, model_data=data, model_id=quiz_id
+                )
+            else:
+                data["company_id"] = company_id
+                quiz = await self._quiz_repo.create_model(db=db, model_data=data)
+            result.append(quiz)
+        return result
