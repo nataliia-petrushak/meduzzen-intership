@@ -23,7 +23,7 @@ class CompanyDetail(CompanyBase):
 class CompanyCreate(BaseModel):
     name: str
     description: str
-    is_hidden: bool
+    is_hidden: bool = False
 
 
 class CompanyUpdate(CompanyBase):

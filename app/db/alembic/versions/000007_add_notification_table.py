@@ -45,6 +45,11 @@ def upgrade() -> None:
             ENUM("unread", "read", name="notification_status"),
             default="unread",
         ),
+        sa.Column(
+            "notification_type",
+            ENUM("new_quiz", "reminder", name="notification_type"),
+            default="new_quiz",
+        ),
         sa.ForeignKeyConstraint(["quiz_id"], ["quiz.id"]),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
     )
@@ -53,3 +58,4 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_table("notification")
     op.execute("DROP TYPE notification_status")
+    op.execute("DROP TYPE notification_type")
