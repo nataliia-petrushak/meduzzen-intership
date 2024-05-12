@@ -61,6 +61,7 @@ class AppSettings(BaseSettings):
     HOST: str
     PORT: int
     LOG_LEVEL: str
+    PYTHONPATH: str
     allowed_origins: list[str] = [
         "http://localhost:8080",
         "http://127.0.0.1:8000",
