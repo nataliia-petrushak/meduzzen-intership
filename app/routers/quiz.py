@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -68,4 +68,19 @@ async def delete_quiz(
 ) -> None:
     return await quiz_service.delete_quiz(
         db=db, company_id=company_id, quiz_id=quiz_id, user=user
+    )
+
+
+@router.post(
+    "/upload_excel", response_model=list[GetQuiz], status_code=status.HTTP_200_OK
+)
+async def upload_quiz_data_from_excel(
+        company_id: UUID,
+        file: UploadFile = File(...),
+        user: GetUser = Depends(get_authenticated_user),
+        db: AsyncSession = Depends(get_db),
+        quiz_service: QuizService = Depends(QuizService),
+) -> list[GetQuiz]:
+    return await quiz_service.upload_quiz_from_excel(
+        file=file, db=db, company_id=company_id, user=user
     )
