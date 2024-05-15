@@ -1,5 +1,4 @@
 import json
-from io import BytesIO
 from uuid import UUID
 
 import pandas as pd
@@ -114,7 +113,7 @@ class QuizService:
     ) -> list[GetQuiz]:
         await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
         content = await file.read()
-        quiz_data = pd.read_excel(BytesIO(content))
+        quiz_data = pd.read_excel(content)
         result = []
         for _, data in quiz_data.iterrows():
             data["questions"] = json.loads(data["questions"])
