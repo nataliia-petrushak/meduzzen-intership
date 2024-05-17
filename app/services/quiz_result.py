@@ -184,7 +184,7 @@ class QuizResultService:
         csv_writer.writeheader()
         for row in data:
             csv_writer.writerow(row)
-            yield csv_string.getvalue()
+        yield csv_string.getvalue()
 
     async def user_get_cashed_data(
         self,
