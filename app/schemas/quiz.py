@@ -13,7 +13,6 @@ class Question(BaseModel):
     @classmethod
     @field_validator("variants", mode="before")
     def validate_variants(cls, variants: list[str]):
-        print(variants)
         if len(variants) < 2:
             raise ValidationError(detail="Variants of answers should be at least 2")
         return variants
