@@ -1,7 +1,7 @@
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import ObjectNotFound
+from app.core.exceptions import ObjectNotFound, ObjectExistError
 from app.db.models import User
 from app.permissions import check_permissions
 from app.schemas.users import UserSignUp, UserUpdate, GetUser
@@ -15,11 +15,10 @@ class UserService:
 
     async def create_model(self, db: AsyncSession, model_data: UserSignUp) -> User:
         try:
-            user = await self._user_repo.get_model_by(
+            await self._user_repo.get_model_by(
                 db=db, filters={"email": model_data.email}
             )
-            user.is_active = True
-            await db.commit()
+            raise ObjectExistError(model_name="User", identifier=model_data.email)
         except ObjectNotFound:
             model_data.password = SecurityService.hash_password(model_data.password)
             model_data = model_data.model_dump()
