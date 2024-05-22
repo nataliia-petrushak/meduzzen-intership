@@ -8,9 +8,9 @@ class ObjectNotFound(Exception):
         super().__init__(self.msg)
 
 
-class NameExistError(Exception):
-    def __init__(self, model_name: str, name: str) -> None:
-        self.msg = f"The {model_name} with name: {name} already exists"
+class ObjectExistError(Exception):
+    def __init__(self, model_name: str, identifier: str) -> None:
+        self.msg = f"The {model_name} with {identifier} already exists"
         super().__init__(self.msg)
 
 

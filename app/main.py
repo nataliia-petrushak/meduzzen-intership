@@ -25,7 +25,7 @@ from app.core.exceptions import (
     ObjectNotFound,
     AuthorizationError,
     AccessDeniedError,
-    NameExistError,
+    ObjectExistError,
     OwnerRequestError,
     AssignError,
     ValidationError,
@@ -71,8 +71,8 @@ async def object_not_found_handler(request: Request, exc: ObjectNotFound):
     )
 
 
-@app.exception_handler(NameExistError)
-async def name_exist_error_handler(request: Request, exc: NameExistError):
+@app.exception_handler(ObjectExistError)
+async def object_exist_error_handler(request: Request, exc: ObjectExistError):
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": exc.msg}
     )
