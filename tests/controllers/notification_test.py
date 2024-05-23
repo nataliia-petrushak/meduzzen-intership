@@ -10,13 +10,13 @@ from tests.constants import quiz_data
 @pytest.mark.asyncio
 async def test_get_notification_list(
     client: TestClient,
-    user_id: UUID,
     token: str,
     prepare_database,
     fill_db_with_notifications,
+    fill_database
 ) -> None:
     response = client.get(
-        f"/notification/{user_id}",
+        f"/me/notification",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
@@ -30,13 +30,13 @@ async def test_get_notification_list(
 @pytest.mark.asyncio
 async def test_change_notification_status(
     client: TestClient,
-    user_id: UUID,
     notification_id: UUID,
     token: str,
     prepare_database,
+    fill_database
 ) -> None:
     response = client.patch(
-        f"/notification/{user_id}/notification/{notification_id}",
+        f"/me/notification/{notification_id}",
         headers={"Authorization": f"Bearer {token}"},
         params={"notification_status": "read"},
     )
@@ -56,7 +56,7 @@ async def test_create_notification_when_quiz_created(
         json=quiz_data,
     )
     response = client.get(
-        f"/notification/{member_id}",
+        f"/me/notification/",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()

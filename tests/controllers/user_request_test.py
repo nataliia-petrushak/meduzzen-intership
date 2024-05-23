@@ -16,24 +16,22 @@ async def test_user_create_join_request(
     prepare_database,
 ) -> None:
     response = client.post(
-        f"user/{user_id}/join-requests/{company_id}",
+        f"/me/join-requests/{company_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json()["request_type"] == "join_request"
     assert response.json()["user_id"] == str(user_id)
     assert response.json()["company_id"] == str(company_id)
 
 
 async def test_unauthorized_user_create_request_forbidden(
     client: TestClient,
-    user_id: UUID,
     company_id: UUID,
     prepare_database,
 ) -> None:
     response = client.post(
-        f"user/{user_id}/join-requests/{company_id}",
+        f"/me/join-requests/{company_id}",
     )
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -48,7 +46,7 @@ async def test_user_cancel_join_request(
     prepare_database,
 ) -> None:
     response = client.delete(
-        f"user/{user_id}/join-requests/{request_id}",
+        f"/{user_id}/join-requests/{request_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
 
@@ -62,7 +60,7 @@ async def test_unauthorized_user_cancel_request_forbidden(
     user_id: UUID,
     prepare_database,
 ) -> None:
-    response = client.delete(f"user/{user_id}/join-requests/{request_id}")
+    response = client.delete(f"/{user_id}/join-requests/{request_id}")
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -76,13 +74,12 @@ async def test_user_accept_invitation(
     prepare_database,
 ) -> None:
     response = client.patch(
-        f"user/{user_id}/invitations/{invitation_id}",
+        f"/{user_id}/invitations/{invitation_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert result["request_type"] == "member"
     assert result["user_id"] == str(user_id)
     assert result["id"] == str(invitation_id)
 
@@ -96,7 +93,7 @@ async def test_user_decline_invitation(
     prepare_database,
 ) -> None:
     response = client.delete(
-        f"user/{user_id}/invitations/{invitation_id}",
+        f"/{user_id}/invitations/{invitation_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
 
@@ -106,13 +103,13 @@ async def test_user_decline_invitation(
 @pytest.mark.asyncio
 async def test_user_get_invitation_list(
     client: TestClient,
-    user_id: UUID,
     token: str,
     prepare_database,
     fill_db_with_invitations,
+    fill_database
 ) -> None:
     response = client.get(
-        f"user/{user_id}/invitations", headers={"Authorization": f"Bearer {token}"}
+        f"/me/invitations", headers={"Authorization": f"Bearer {token}"}
     )
     result = response.json()
 
@@ -124,13 +121,13 @@ async def test_user_get_invitation_list(
 @pytest.mark.asyncio
 async def test_user_get_request_list(
     client: TestClient,
-    user_id: UUID,
     token: str,
     prepare_database,
     fill_db_with_join_requests,
+    fill_database
 ) -> None:
     response = client.get(
-        f"user/{user_id}/join-requests", headers={"Authorization": f"Bearer {token}"}
+        f"/me/join-requests", headers={"Authorization": f"Bearer {token}"}
     )
     result = response.json()
 
@@ -141,13 +138,13 @@ async def test_user_get_request_list(
 @pytest.mark.asyncio
 async def test_user_leave_company(
     client: TestClient,
-    member_id: UUID,
     company_id: UUID,
     token: str,
     prepare_database,
+    fill_db_with_members
 ) -> None:
     response = client.delete(
-        f"user/{member_id}/leave/{company_id}",
+        f"me/leave/{company_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
 

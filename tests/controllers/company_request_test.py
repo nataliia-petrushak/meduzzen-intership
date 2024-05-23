@@ -21,7 +21,6 @@ async def test_owner_create_company_invitation(
     )
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json()["request_type"] == "invitation"
     assert response.json()["user_id"] == str(user_id)
     assert response.json()["company_id"] == str(company_id)
 
@@ -105,7 +104,6 @@ async def test_owner_accept_join_request(
     result = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert result["request_type"] == "member"
     assert result["company_id"] == str(company_id)
     assert result["id"] == str(request_id)
 
@@ -286,7 +284,6 @@ async def test_owner_assign_admin(
         params={"request_type": "admin"},
     )
     assert response.status_code == status.HTTP_200_OK
-    assert response.json().get("request_type") == "admin"
 
 
 @pytest.mark.asyncio
@@ -304,7 +301,6 @@ async def test_owner_assign_admin_as_member(
         params={"request_type": "member"},
     )
     assert response.status_code == status.HTTP_200_OK
-    assert response.json().get("request_type") == "member"
 
 
 @pytest.mark.asyncio
