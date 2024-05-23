@@ -59,10 +59,18 @@ class QuizService:
                 },
             )
 
+    async def check_quiz_exist_in_company(self, name: str, company_id: UUID, db: AsyncSession) -> None:
+        try:
+            await self._quiz_repo.get_model_by(db=db, filters={"name": name, "company_id": company_id})
+            raise ObjectAlreadyExistError(model_name="Quiz", identifier=name)
+        except ObjectNotFound:
+            return None
+
     async def create_quiz(
         self, company_id: UUID, quiz_data: QuizCreate, user: GetUser, db: AsyncSession
     ) -> GetQuiz:
         await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
+        await self.check_quiz_exist_in_company(db=db, company_id=company_id, name=quiz_data.name)
         model_data = quiz_data.model_dump()
         model_data["company_id"] = company_id
 
