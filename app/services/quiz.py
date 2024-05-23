@@ -5,7 +5,7 @@ import pandas as pd
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import AccessDeniedError, ObjectNotFound
+from app.core.exceptions import AccessDeniedError, ObjectNotFound, NoResultsError, ObjectAlreadyExistError
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.notification import NotificationRepository
 from app.db.alembic.repos.quiz_repo import QuizRepository
