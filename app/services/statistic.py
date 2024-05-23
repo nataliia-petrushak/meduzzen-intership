@@ -7,7 +7,6 @@ from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.quiz_repo import QuizRepository
 from app.db.alembic.repos.quiz_result_repo import QuizResultRepository
 from app.db.alembic.repos.request_repo import RequestRepository
-from app.permissions import check_permissions
 from app.schemas.statistic import (
     AvgScoreWithTime,
     QuizWithCompleteTime,
@@ -61,7 +60,7 @@ class StatisticService:
         return result
 
     async def user_avg_score_dynamic(
-        self, db: AsyncSession, user: GetUser, user_id: UUID
+        self, db: AsyncSession, user: GetUser
     ) -> list[AvgScoreWithTime]:
         check_permissions(user_id=user_id, user=user)
         return await self.average_score_dynamic(db=db, user_id=user_id)
@@ -75,11 +74,11 @@ class StatisticService:
         )
 
     async def quiz_list_with_last_completion_time(
-        self, db: AsyncSession, user_id: UUID, user: GetUser
+        self, db: AsyncSession, user: GetUser
     ) -> list[QuizWithCompleteTime]:
         check_permissions(user_id=user_id, user=user)
         user_results = await self._result_repo.get_model_list(
-            db=db, filters={"user_id": user_id}
+            db=db, filters={"user_id": user.id}
         )
         return [
             QuizWithCompleteTime(

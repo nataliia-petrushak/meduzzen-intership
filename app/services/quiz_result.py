@@ -165,11 +165,9 @@ class QuizResultService:
         return Rating(rating=rating)
 
     async def count_rating_for_user(
-        self, db: AsyncSession, user_id: UUID, user: GetUser, company_id: UUID = None
+        self, db: AsyncSession, user: GetUser, company_id: UUID = None
     ) -> Rating:
-        check_permissions(user_id=user_id, user=user)
-
-        filters = {"user_id": user_id}
+        filters = {"user_id": user.id}
         if company_id:
             filters["company_id"] = company_id
 

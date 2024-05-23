@@ -11,7 +11,7 @@ from app.schemas.users import GetUser
 from app.services.auth import get_authenticated_user
 from app.services.user_request import UserRequestService
 
-router = APIRouter(tags=["user_request"], prefix="/user")
+router = APIRouter(tags=["user_request"])
 
 
 @router.patch(
@@ -47,19 +47,18 @@ async def user_decline_invitation(
 
 
 @router.post(
-    "/{user_id}/join-requests/{company_id}",
+    "/me/join-requests/{company_id}",
     response_model=GetRequest,
     status_code=status.HTTP_201_CREATED,
 )
 async def user_send_join_request(
-    user_id: UUID,
     company_id: UUID,
     user: GetUser = Depends(get_authenticated_user),
     db: AsyncSession = Depends(get_db),
     request_service: UserRequestService = Depends(UserRequestService),
 ) -> GetRequest:
     return await request_service.user_send_join_request(
-        db=db, company_id=company_id, user_id=user_id, user=user
+        db=db, company_id=company_id, user=user
     )
 
 
@@ -79,12 +78,11 @@ async def user_cancel_join_request(
 
 
 @router.get(
-    "/{user_id}/invitations",
+    "/me/invitations",
     response_model=list[CompanyRequest],
     status_code=status.HTTP_200_OK,
 )
 async def user_invitation_list(
-    user_id: UUID,
     db: AsyncSession = Depends(get_db),
     user: GetUser = Depends(get_authenticated_user),
     request_service: UserRequestService = Depends(UserRequestService),
@@ -92,17 +90,16 @@ async def user_invitation_list(
     limit: int = 10,
 ) -> list[CompanyRequest]:
     return await request_service.get_user_requests(
-        db=db, user_id=user_id, offset=offset, limit=limit, user=user
+        db=db, offset=offset, limit=limit, user=user
     )
 
 
 @router.get(
-    "/{user_id}/join-requests",
+    "/me/join-requests",
     response_model=list[CompanyRequest],
     status_code=status.HTTP_200_OK,
 )
 async def user_join_request_list(
-    user_id: UUID,
     db: AsyncSession = Depends(get_db),
     user: GetUser = Depends(get_authenticated_user),
     request_service: UserRequestService = Depends(UserRequestService),
@@ -111,7 +108,6 @@ async def user_join_request_list(
 ) -> list[CompanyRequest]:
     return await request_service.get_user_requests(
         db=db,
-        user_id=user_id,
         offset=offset,
         limit=limit,
         user=user,
@@ -119,14 +115,13 @@ async def user_join_request_list(
     )
 
 
-@router.delete("/{user_id}/leave/{company_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/me/leave/{company_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def user_leave_request(
-    user_id: UUID,
     company_id: UUID,
     user: GetUser = Depends(get_authenticated_user),
     db: AsyncSession = Depends(get_db),
     request_service: UserRequestService = Depends(UserRequestService),
 ) -> None:
     return await request_service.user_leave_company(
-        db=db, user_id=user_id, company_id=company_id, user=user
+        db=db, company_id=company_id, user=user
     )

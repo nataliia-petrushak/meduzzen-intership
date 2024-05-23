@@ -31,24 +31,22 @@ async def get_user_by_id(
     return await user_service.get_model_by_id(db=db, model_id=user_id)
 
 
-@router.patch("/{user_id}", response_model=UserUpdate, status_code=status.HTTP_200_OK)
+@router.patch("/me", response_model=UserUpdate, status_code=status.HTTP_200_OK)
 async def update_user(
-    user_id: UUID,
     user_data: UserUpdate,
     user: GetUser = Depends(get_authenticated_user),
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
 ) -> UserUpdate:
     return await user_service.update_model(
-        model_data=user_data, db=db, model_id=user_id, user=user
+        model_data=user_data, db=db, user=user
     )
 
 
-@router.patch("/{user_id}/deactivate", status_code=status.HTTP_204_NO_CONTENT)
+@router.patch("/me/deactivate", status_code=status.HTTP_204_NO_CONTENT)
 async def deactivate_user(
-    user_id: UUID,
     user: GetUser = Depends(get_authenticated_user),
     db: AsyncSession = Depends(get_db),
     user_service: UserService = Depends(UserService),
 ) -> None:
-    return await user_service.user_deactivate(user_id=user_id, db=db, user=user)
+    return await user_service.user_deactivate(db=db, user=user)
