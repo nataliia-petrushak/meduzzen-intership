@@ -9,13 +9,13 @@ from starlette.testclient import TestClient
 @pytest.mark.asyncio
 async def test_user_avg_score_dynamic(
     client: TestClient,
-    user_id: UUID,
     token: str,
     prepare_database,
     fill_db_with_results,
+    fill_database
 ) -> None:
     response = client.get(
-        f"statistic/{user_id}/avg_score_dynamics",
+        f"statistic/me/avg_score_dynamics",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
@@ -67,13 +67,13 @@ async def test_get_user_all_company_users_avg_dynamic_forbidden(
 @pytest.mark.asyncio
 async def test_get_quiz_last_comp_time(
     client: TestClient,
-    user_id: UUID,
     token: str,
     prepare_database,
     fill_db_with_results,
+    fill_database
 ) -> None:
     response = client.get(
-        f"statistic/{user_id}/quizzes",
+        f"statistic/me/quizzes",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
