@@ -109,7 +109,7 @@ async def test_user_get_invitation_list(
     fill_database
 ) -> None:
     response = client.get(
-        f"/me/invitations", headers={"Authorization": f"Bearer {token}"}
+        "/me/invitations", headers={"Authorization": f"Bearer {token}"}
     )
     result = response.json()
 
@@ -127,7 +127,7 @@ async def test_user_get_request_list(
     fill_database
 ) -> None:
     response = client.get(
-        f"/me/join-requests", headers={"Authorization": f"Bearer {token}"}
+        "/me/join-requests", headers={"Authorization": f"Bearer {token}"}
     )
     result = response.json()
 

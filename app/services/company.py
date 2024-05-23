@@ -19,7 +19,9 @@ class CompanyService:
             await self._company_repo.get_model_by(
                 db=db, filters={"name": model_data.name}
             )
-            raise ObjectAlreadyExistError(model_name="company", identifier=model_data.name)
+            raise ObjectAlreadyExistError(
+                model_name="company", identifier=model_data.name
+            )
         except ObjectNotFound:
             model_data = model_data.model_dump()
             model_data["owner_id"] = user.id

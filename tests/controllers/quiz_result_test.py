@@ -73,7 +73,7 @@ async def test_user_get_total_rating(
     client: TestClient, token: str, fill_db_with_results, fill_database
 ) -> None:
     response = client.get(
-        f"result/me/total_rating",
+        "result/me/total_rating",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
@@ -129,7 +129,7 @@ async def test_user_get_cached_results(
     fill_database
 ) -> None:
     response = client.get(
-        f"result/me/cached_results",
+        "result/me/cached_results",
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == status.HTTP_200_OK

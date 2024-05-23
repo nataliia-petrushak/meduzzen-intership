@@ -37,7 +37,7 @@ async def test_update_user_endpoint(
     client: TestClient, prepare_database, fill_database, token
 ) -> None:
     response = client.patch(
-        f"users/me",
+        "users/me",
         json=user_update_data,
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -50,6 +50,6 @@ def test_delete_user_endpoint(
     client: TestClient, prepare_database, fill_database, token
 ) -> None:
     response = client.patch(
-        f"users/me/deactivate", headers={"Authorization": f"Bearer {token}"}
+        "users/me/deactivate", headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == status.HTTP_204_NO_CONTENT

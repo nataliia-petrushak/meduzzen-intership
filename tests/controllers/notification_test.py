@@ -16,7 +16,7 @@ async def test_get_notification_list(
     fill_database
 ) -> None:
     response = client.get(
-        f"/me/notification",
+        "/me/notification",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
@@ -56,7 +56,7 @@ async def test_create_notification_when_quiz_created(
         json=quiz_data,
     )
     response = client.get(
-        f"/me/notification/",
+        "/me/notification/",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()

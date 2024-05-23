@@ -3,7 +3,9 @@ from uuid import UUID
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import OwnerRequestError, AssignError, IntegrityError, NoResultsError
+from app.core.exceptions import (
+    OwnerRequestError, AssignError, IntegrityError, NoResultsError
+)
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.db.models import RequestType

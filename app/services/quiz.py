@@ -5,13 +5,15 @@ import pandas as pd
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import AccessDeniedError, ObjectNotFound, NoResultsError, ObjectAlreadyExistError
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.notification import NotificationRepository
 from app.db.alembic.repos.quiz_repo import QuizRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.schemas.quiz import QuizCreate, GetQuiz, QuizUpdate
 from app.schemas.users import GetUser
+from app.core.exceptions import (
+    AccessDeniedError, ObjectNotFound, NoResultsError, ObjectAlreadyExistError
+)
 
 
 class QuizService:
@@ -59,9 +61,13 @@ class QuizService:
                 },
             )
 
-    async def check_quiz_exist_in_company(self, name: str, company_id: UUID, db: AsyncSession) -> None:
+    async def check_quiz_exist_in_company(
+            self, name: str, company_id: UUID, db: AsyncSession
+    ) -> None:
         try:
-            await self._quiz_repo.get_model_by(db=db, filters={"name": name, "company_id": company_id})
+            await self._quiz_repo.get_model_by(
+                db=db, filters={"name": name, "company_id": company_id}
+            )
             raise ObjectAlreadyExistError(model_name="Quiz", identifier=name)
         except ObjectNotFound:
             return None
@@ -70,7 +76,9 @@ class QuizService:
         self, company_id: UUID, quiz_data: QuizCreate, user: GetUser, db: AsyncSession
     ) -> GetQuiz:
         await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
-        await self.check_quiz_exist_in_company(db=db, company_id=company_id, name=quiz_data.name)
+        await self.check_quiz_exist_in_company(
+            db=db, company_id=company_id, name=quiz_data.name
+        )
         model_data = quiz_data.model_dump()
         model_data["company_id"] = company_id
 

@@ -15,7 +15,7 @@ async def test_user_avg_score_dynamic(
     fill_database
 ) -> None:
     response = client.get(
-        f"statistic/me/avg_score_dynamics",
+        "statistic/me/avg_score_dynamics",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
@@ -73,7 +73,7 @@ async def test_get_quiz_last_comp_time(
     fill_database
 ) -> None:
     response = client.get(
-        f"statistic/me/quizzes",
+        "statistic/me/quizzes",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
