@@ -94,9 +94,12 @@ class QuizService:
         offset: int = 0,
         limit: int = 10,
     ) -> list[GetQuiz]:
-        return await self._quiz_repo.get_model_list(
+        quizzes = await self._quiz_repo.get_model_list(
             db=db, offset=offset, limit=limit, filters={"company_id": company_id}
         )
+        if not quizzes:
+            raise NoResultsError()
+        return quizzes
 
     async def delete_quiz(
         self, company_id: UUID, user: GetUser, db: AsyncSession, quiz_id: UUID

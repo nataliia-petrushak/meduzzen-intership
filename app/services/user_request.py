@@ -3,7 +3,7 @@ from uuid import UUID
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import OwnerRequestError, IntegrityError
+from app.core.exceptions import OwnerRequestError, IntegrityError, NoResultsError
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.permissions import check_permissions
@@ -60,13 +60,15 @@ class UserRequestService:
         offset: int = 0,
         request_type: str = "invitation",
     ) -> list[CompanyRequest]:
-        check_permissions(user_id=user_id, user=user)
-        return await self._request_repo.get_model_list(
+        requests = await self._request_repo.get_model_list(
             db=db,
             limit=limit,
             offset=offset,
-            filters={"user_id": user_id, "request_type": request_type},
+            filters={"user_id": user.id, "request_type": request_type},
         )
+        if not requests:
+            raise NoResultsError()
+        return requests
 
     async def user_leave_company(
         self, db: AsyncSession, user: GetUser, company_id: UUID

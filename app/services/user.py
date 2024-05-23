@@ -38,9 +38,12 @@ class UserService:
     async def get_model_list(
         self, db: AsyncSession, offset: int = 0, limit: int = 10
     ) -> list[User]:
-        return await self._user_repo.get_model_list(
+        users = await self._user_repo.get_model_list(
             db, offset, limit, filters={"is_active": True}
         )
+        if not users:
+            raise NoResultsError()
+        return users
 
     async def get_model_by_id(self, db: AsyncSession, model_id: UUID) -> User:
         return await self._user_repo.get_model_by(db=db, filters={"id": model_id})

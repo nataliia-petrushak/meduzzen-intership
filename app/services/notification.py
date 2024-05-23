@@ -38,6 +38,9 @@ class NotificationService:
         notifications = await self._notification_repo.get_model_list(
             db=db, filters={"user_id": user.id}, limit=limit, offset=offset
         )
+        if not notifications:
+            raise NoResultsError()
+        return notifications
 
     async def get_overdue_quiz_list(self, db: AsyncSession) -> list[OverdueQuiz]:
         results = await self._result_repo.get_overdue_quiz_results(db=db)

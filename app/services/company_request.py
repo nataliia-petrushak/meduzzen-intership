@@ -3,7 +3,7 @@ from uuid import UUID
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import OwnerRequestError, AssignError, IntegrityError
+from app.core.exceptions import OwnerRequestError, AssignError, IntegrityError, NoResultsError
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.request_repo import RequestRepository
 from app.db.models import RequestType
@@ -73,7 +73,7 @@ class CompanyRequestService:
             db=db, filters={"id": company_id}
         )
         check_permissions(user_id=company.owner_id, user=user)
-        return await self._request_repo.get_model_list(
+        company_requests = await self._request_repo.get_model_list(
             db=db,
             offset=offset,
             limit=limit,
@@ -82,6 +82,9 @@ class CompanyRequestService:
                 "request_type": request_type
             }
         )
+        if not company_requests:
+            raise NoResultsError()
+        return company_requests
 
     async def get_company_members(
         self,
@@ -90,7 +93,7 @@ class CompanyRequestService:
         offset: int = 0,
         limit: int = 10,
     ) -> list[UserRequest]:
-        return await self._request_repo.get_model_list(
+        members = await self._request_repo.get_model_list(
             db=db,
             filters={
                 "company_id": company_id,
@@ -99,6 +102,9 @@ class CompanyRequestService:
             offset=offset,
             limit=limit,
         )
+        if not members:
+            raise NoResultsError()
+        return members
 
     async def company_delete_user(
         self, db: AsyncSession, user_id: UUID, company_id: UUID, user: GetUser
@@ -144,9 +150,12 @@ class CompanyRequestService:
         offset: int = 0,
         limit: int = 10,
     ) -> list[UserRequest]:
-        return await self._request_repo.get_model_list(
+        admins = await self._request_repo.get_model_list(
             db=db,
             filters={"company_id": company_id, "request_type": "admin"},
             offset=offset,
             limit=limit,
         )
+        if not admins:
+            raise NoResultsError()
+        return admins

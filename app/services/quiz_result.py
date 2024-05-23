@@ -5,7 +5,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import AccessDeniedError, ObjectNotFound
+from app.core.exceptions import AccessDeniedError, ObjectNotFound, NoResultsError
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.quiz_repo import QuizRepository
 from app.db.alembic.repos.request_repo import RequestRepository
@@ -184,13 +184,11 @@ class QuizResultService:
             csv_writer.writerow(row)
         yield csv_string.getvalue()
 
-    async def user_get_cashed_data(
-        self,
-        user: GetUser,
-        user_id: UUID,
-    ) -> list:
-        check_permissions(user_id=user_id, user=user)
-        return await self._redis.get_by_part_of_key(f"*{user_id}")
+    async def user_get_cashed_data(self, user: GetUser) -> list:
+        data = await self._redis.get_by_part_of_key(f"*{user.id}")
+        if not data:
+            raise NoResultsError()
+        return data
 
     async def company_get_cashed_data(
         self,
@@ -206,4 +204,6 @@ class QuizResultService:
             data = [info for info in data if info["user_id"] == user_id]
         if quiz_id:
             data = [info for info in data if info["quiz_id"] == quiz_id]
+        if not data:
+            raise NoResultsError()
         return data

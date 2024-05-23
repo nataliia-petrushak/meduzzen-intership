@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.db.database import get_db
-from app.schemas.company import GetCompany
 from app.schemas.request import GetRequest, CompanyRequest
 from app.schemas.users import GetUser
 from app.services.auth import get_authenticated_user

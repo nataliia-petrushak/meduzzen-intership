@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import ObjectNotFound, AccessDeniedError
+from app.core.exceptions import ObjectNotFound, AccessDeniedError, NoResultsError
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.db.alembic.repos.quiz_repo import QuizRepository
 from app.db.alembic.repos.quiz_result_repo import QuizResultRepository
@@ -57,29 +57,37 @@ class StatisticService:
                 date=data["date"], score=round(corr_answers / all_questions, 3)
             )
             result.append(avg_score)
+        if not result:
+            raise NoResultsError()
         return result
 
     async def user_avg_score_dynamic(
         self, db: AsyncSession, user: GetUser
     ) -> list[AvgScoreWithTime]:
-        check_permissions(user_id=user_id, user=user)
-        return await self.average_score_dynamic(db=db, user_id=user_id)
+        results = await self.average_score_dynamic(db=db, user_id=user.id)
+        if not results:
+            raise NoResultsError()
+        return results
 
     async def company_avg_score_dynamic(
         self, db: AsyncSession, user: GetUser, company_id: UUID, user_id: UUID = None
     ) -> list[AvgScoreWithTime]:
         await self.check_user_is_admin_or_owner(db=db, company_id=company_id, user=user)
-        return await self.average_score_dynamic(
+        results = await self.average_score_dynamic(
             db=db, user_id=user_id, company_id=company_id
         )
+        if not results:
+            raise NoResultsError()
+        return results
 
     async def quiz_list_with_last_completion_time(
         self, db: AsyncSession, user: GetUser
     ) -> list[QuizWithCompleteTime]:
-        check_permissions(user_id=user_id, user=user)
         user_results = await self._result_repo.get_model_list(
             db=db, filters={"user_id": user.id}
         )
+        if not user_results:
+            raise NoResultsError()
         return [
             QuizWithCompleteTime(
                 quiz_id=result.quiz_id, date=result.all_results[-1]["date"]
@@ -93,6 +101,8 @@ class StatisticService:
         quiz_results = await self._result_repo.get_model_list(
             db=db, filters={"company_id": company_id, "quiz_id": quiz_id}
         )
+        if not quiz_results:
+            raise NoResultsError()
         return [
             UsersQuizCompleteTime(
                 user_id=result.user_id, date=result.all_results[-1]["date"]
