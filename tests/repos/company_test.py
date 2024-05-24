@@ -13,7 +13,6 @@ async def test_add_company_func(db: AsyncSession, user_id: UUID) -> None:
     result = await company_repo.create_model(db=db, model_data=company_data)
 
     assert result.name == company_data["name"]
-    assert result.is_hidden == company_data["is_hidden"]
 
 
 @pytest.mark.asyncio

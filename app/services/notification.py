@@ -2,11 +2,10 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import ObjectNotFound
+from app.core.exceptions import ObjectNotFound, NoResultsError
 from app.db.alembic.repos.notification import NotificationRepository
 from app.db.alembic.repos.quiz_result_repo import QuizResultRepository
 from app.db.models import NotificationStatus
-from app.permissions import check_permissions
 from app.schemas.notification import GetNotification, OverdueQuiz
 from app.schemas.users import GetUser
 from app.logger import custom_logger
@@ -20,12 +19,9 @@ class NotificationService:
     async def change_notification_status(
         self,
         notification_id: UUID,
-        user_id: UUID,
-        user: GetUser,
         db: AsyncSession,
         notification_status: NotificationStatus,
     ) -> GetNotification:
-        check_permissions(user_id=user_id, user=user)
         return await self._notification_repo.update_model(
             db=db,
             model_data={"notification_status": notification_status},
@@ -34,16 +30,17 @@ class NotificationService:
 
     async def user_get_notification_list(
         self,
-        user_id: UUID,
         user: GetUser,
         db: AsyncSession,
         offset: int = 0,
         limit: int = 10,
     ) -> list[GetNotification]:
-        check_permissions(user_id=user_id, user=user)
-        return await self._notification_repo.get_model_list(
-            db=db, filters={"user_id": user_id}, limit=limit, offset=offset
+        notifications = await self._notification_repo.get_model_list(
+            db=db, filters={"user_id": user.id}, limit=limit, offset=offset
         )
+        if not notifications:
+            raise NoResultsError()
+        return notifications
 
     async def get_overdue_quiz_list(self, db: AsyncSession) -> list[OverdueQuiz]:
         results = await self._result_repo.get_overdue_quiz_results(db=db)

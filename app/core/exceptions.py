@@ -8,9 +8,9 @@ class ObjectNotFound(Exception):
         super().__init__(self.msg)
 
 
-class NameExistError(Exception):
-    def __init__(self, model_name: str, name: str) -> None:
-        self.msg = f"The {model_name} with name: {name} already exists"
+class ObjectAlreadyExistError(Exception):
+    def __init__(self, model_name: str, identifier: str) -> None:
+        self.msg = f"The {model_name} with {identifier} already exists"
         super().__init__(self.msg)
 
 
@@ -52,3 +52,8 @@ class IntegrityError(Exception):
         self.msg = (f"The object with company id {company_id} "
                     f"and user_id {user_id} already exists")
         super().__init__(self.msg)
+
+
+class NoResultsError(Exception):
+    def __init__(self):
+        self.msg = "Unfortunately there are no results for this request"

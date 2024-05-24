@@ -70,10 +70,10 @@ async def test_not_member_get_result_forbidden(
 
 @pytest.mark.asyncio
 async def test_user_get_total_rating(
-    client: TestClient, user_id: UUID, token: str, fill_db_with_results
+    client: TestClient, token: str, fill_db_with_results, fill_database
 ) -> None:
     response = client.get(
-        f"result/{user_id}/total_rating",
+        "result/me/total_rating",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
@@ -88,12 +88,12 @@ async def test_user_get_total_rating(
 async def test_user_get_company_rating(
     client: TestClient,
     company_id: UUID,
-    user_id: UUID,
     token: str,
     fill_db_with_results,
+    fill_database
 ) -> None:
     response = client.get(
-        f"result/{user_id}/company/{company_id}",
+        f"result/me/company/{company_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
@@ -108,11 +108,11 @@ async def test_user_get_company_rating(
 async def test_user_get_total_rating_without_results(
     client: TestClient,
     company_id: UUID,
-    user_id: UUID,
     token: str,
+    fill_database
 ) -> None:
     response = client.get(
-        f"result/{user_id}/company/{company_id}",
+        f"result/me/company/{company_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
@@ -124,12 +124,12 @@ async def test_user_get_total_rating_without_results(
 @pytest.mark.asyncio
 async def test_user_get_cached_results(
     client: TestClient,
-    user_id: UUID,
     token: str,
     fill_db_with_results,
+    fill_database
 ) -> None:
     response = client.get(
-        f"result/{user_id}/cached_results",
+        "result/me/cached_results",
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == status.HTTP_200_OK

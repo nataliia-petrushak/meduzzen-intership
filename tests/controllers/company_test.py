@@ -9,18 +9,17 @@ from tests.constants import company_data, company_payload, company_update_data
 
 @pytest.mark.asyncio
 async def test_create_company(
-    client: TestClient, owner_token: str, prepare_database
+    client: TestClient, token: str, prepare_database, fill_database
 ) -> None:
     response = client.post(
         "/companies",
         json=company_data,
-        headers={"Authorization": f"Bearer {owner_token}"},
+        headers={"Authorization": f"Bearer {token}"},
     )
 
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json()["name"] == company_data["name"]
     assert response.json()["description"] == company_data["description"]
-    assert response.json()["is_hidden"] == company_data["is_hidden"]
 
 
 @pytest.mark.asyncio
@@ -88,7 +87,6 @@ async def test_update_company_authorized_forbidden(
 
     assert response.status_code == status.HTTP_200_OK
     assert result["name"] == company_update_data["name"]
-    assert result["is_hidden"] == company_update_data["is_hidden"]
 
 
 @pytest.mark.asyncio

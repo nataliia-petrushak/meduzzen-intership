@@ -34,10 +34,10 @@ def test_get_user_by_id_endpoint(
 
 
 async def test_update_user_endpoint(
-    client: TestClient, user_id: UUID, prepare_database, fill_database, token
+    client: TestClient, prepare_database, fill_database, token
 ) -> None:
     response = client.patch(
-        f"users/{user_id}",
+        "users/me",
         json=user_update_data,
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -47,9 +47,9 @@ async def test_update_user_endpoint(
 
 
 def test_delete_user_endpoint(
-    client: TestClient, user_id: UUID, prepare_database, fill_database, token
+    client: TestClient, prepare_database, fill_database, token
 ) -> None:
     response = client.patch(
-        f"users/{user_id}/deactivate", headers={"Authorization": f"Bearer {token}"}
+        "users/me/deactivate", headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == status.HTTP_204_NO_CONTENT

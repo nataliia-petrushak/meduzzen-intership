@@ -8,7 +8,7 @@ from app.db.alembic.repos.user_repo import UserRepository
 user_payload = [
     {
         "username": "owner",
-        "password": "string",
+        "password": "string12",
         "email": "owner@test.com",
         "is_active": True,
     },
@@ -20,27 +20,27 @@ user_payload = [
     },
     {
         "username": "test_2",
-        "password": "string",
+        "password": "string12",
         "email": "test_2@test.com",
         "is_active": True,
     },
     {
         "username": "test_3",
-        "password": "string",
+        "password": "string12",
         "email": "test_3@test.com",
         "is_active": True,
     },
     {
         "username": "test_4",
-        "password": "string",
+        "password": "string12",
         "email": "test_4@test.com",
         "is_active": True,
     },
 ]
 company_payload = [
-    {"name": "test_1", "description": "", "is_hidden": False},
-    {"name": "test_2", "description": "", "is_hidden": False},
-    {"name": "test_3", "description": "", "is_hidden": False},
+    {"name": "test_1", "description": ""},
+    {"name": "test_2", "description": ""},
+    {"name": "test_3", "description": ""},
 ]
 
 quiz_payload = [
@@ -54,7 +54,7 @@ quiz_payload = [
         ],
     },
     {
-        "name": "Test_1",
+        "name": "Test_2",
         "description": "",
         "questions": [
             {"question": "1", "variants": ["1", "2"], "answers": ["1"]},
@@ -63,7 +63,7 @@ quiz_payload = [
         ],
     },
     {
-        "name": "Test_1",
+        "name": "Test_3",
         "description": "",
         "questions": [
             {"question": "1", "variants": ["1", "2"], "answers": ["1"]},
@@ -102,7 +102,7 @@ user_update_data = {
 company_update_data = {"name": "Updated", "description": "", "is_hidden": True}
 
 pydentic_create_data = UserSignUp(
-    username="Afanasiy", email="email@email.com", password="1234567"
+    username="Afanasiy", email="email@email.com", password="12345678"
 )
 
 pydentic_update_data = UserUpdate(username="Bruno", password="<PASSWORD>")
@@ -112,7 +112,7 @@ company_repo = CompanyRepository()
 quiz_result_repo = QuizResultRepository()
 request_repo = RequestRepository()
 
-company_data = {"name": "test_1", "description": "", "is_hidden": False}
+company_data = {"name": "test_1", "description": ""}
 quiz_data = {
     "name": "Test",
     "description": "",
@@ -132,12 +132,12 @@ quiz_update_data = {
     ],
 }
 quiz_data_1_question = {
-    "name": "Test",
+    "name": "Test4",
     "description": "",
     "questions": [{"question": "1", "variants": ["1", "1"], "answers": ["1", "1"]}],
 }
 quiz_data_1_answer = {
-    "name": "Test",
+    "name": "Test5",
     "description": "",
     "questions": [
         {"question": "1", "variants": ["1"], "answers": ["1"]},

@@ -18,18 +18,17 @@ router = APIRouter(tags=["statistic"], prefix="/statistic")
 
 
 @router.get(
-    "/{user_id}/avg_score_dynamics",
+    "/me/avg_score_dynamics",
     response_model=list[AvgScoreWithTime],
     status_code=status.HTTP_200_OK,
 )
 async def get_user_avg_dynamic(
-    user_id: UUID,
     db: AsyncSession = Depends(get_db),
     user: GetUser = Depends(get_authenticated_user),
     statistic_service: StatisticService = Depends(StatisticService),
 ) -> list[AvgScoreWithTime]:
     return await statistic_service.user_avg_score_dynamic(
-        db=db, user_id=user_id, user=user
+        db=db, user=user
     )
 
 
@@ -51,18 +50,17 @@ async def get_company_users_avg_dynamic(
 
 
 @router.get(
-    "/{user_id}/quizzes",
+    "/me/quizzes",
     response_model=list[QuizWithCompleteTime],
     status_code=status.HTTP_200_OK,
 )
 async def get_last_completion_time_of_quizzes(
-    user_id: UUID,
     user: GetUser = Depends(get_authenticated_user),
     statistic_service: StatisticService = Depends(StatisticService),
     db: AsyncSession = Depends(get_db),
 ) -> list[QuizWithCompleteTime]:
     return await statistic_service.quiz_list_with_last_completion_time(
-        db=db, user_id=user_id, user=user
+        db=db, user=user
     )
 
 

@@ -1,7 +1,7 @@
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import NameExistError, ObjectNotFound
+from app.core.exceptions import ObjectAlreadyExistError, ObjectNotFound
 from app.db.alembic.repos.company_repo import CompanyRepository
 from app.permissions import check_permissions
 from app.schemas.company import CompanyCreate, CompanyUpdate, GetCompany, CompanyDetail
@@ -19,7 +19,9 @@ class CompanyService:
             await self._company_repo.get_model_by(
                 db=db, filters={"name": model_data.name}
             )
-            raise NameExistError(model_name="company", name=model_data.name)
+            raise ObjectAlreadyExistError(
+                model_name="company", identifier=model_data.name
+            )
         except ObjectNotFound:
             model_data = model_data.model_dump()
             model_data["owner_id"] = user.id
@@ -43,7 +45,10 @@ class CompanyService:
         )
 
     async def get_model_by_id(self, db: AsyncSession, model_id: UUID) -> CompanyDetail:
-        return await self._company_repo.get_model_by(db=db, filters={"id": model_id})
+        company = await self._company_repo.get_model_by(db=db, filters={"id": model_id})
+        if company.is_hidden:
+            raise ObjectNotFound(model_name="Company", identifier=model_id)
+        return company
 
     async def delete_model(
         self, db: AsyncSession, model_id: UUID, user: GetUser

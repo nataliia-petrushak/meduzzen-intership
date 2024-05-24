@@ -25,11 +25,12 @@ from app.core.exceptions import (
     ObjectNotFound,
     AuthorizationError,
     AccessDeniedError,
-    NameExistError,
+    ObjectAlreadyExistError,
     OwnerRequestError,
     AssignError,
     ValidationError,
     IntegrityError,
+    NoResultsError,
 )
 
 
@@ -71,8 +72,8 @@ async def object_not_found_handler(request: Request, exc: ObjectNotFound):
     )
 
 
-@app.exception_handler(NameExistError)
-async def name_exist_error_handler(request: Request, exc: NameExistError):
+@app.exception_handler(ObjectAlreadyExistError)
+async def object_exist_error_handler(request: Request, exc: ObjectAlreadyExistError):
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": exc.msg}
     )
@@ -117,6 +118,13 @@ async def validation_error_handler(request: Request, exc: ValidationError):
 async def integrity_error_handler(request: Request, exc: IntegrityError):
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT, content={"message": exc.msg}
+    )
+
+
+@app.exception_handler(NoResultsError)
+async def no_results_error_handler(request: Request, exc: NoResultsError):
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND, content={"message": exc.msg}
     )
 
 

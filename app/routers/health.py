@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from starlette import status
 
-router = APIRouter()
+router = APIRouter(tags=["health"])
 
 
 @router.get("/")
